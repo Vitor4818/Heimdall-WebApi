@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "hpJmLLyDxHFCoa3od0+UMvbFujSWTy/RU7c7MSLGx9E=",
+  "Source": "heimdall-api",
+  "BasePath": "_content/heimdall-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
