@@ -10,7 +10,8 @@ using HeimdallModel; // Adicione isso no início do arquivo MotoService.cs
         public List<MotoModel> ListarTodas() => _motos;
 
         public MotoModel? ObterPorId(int id) => _motos.FirstOrDefault(m => m.id == id);
-
+        
+        public MotoModel? ObterPorTipo(string tipo) => _motos.FirstOrDefault(m=> m.tipoMoto == tipo);
         public MotoModel Criar(MotoModel moto)
         {
             moto.id = _nextId++;

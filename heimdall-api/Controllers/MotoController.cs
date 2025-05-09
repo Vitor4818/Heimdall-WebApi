@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc; // Certifique-se de que você está referenciando o nome correto para o serviço
-using HeimdallModel;   // E para o modelo
+using Microsoft.AspNetCore.Mvc; 
+using HeimdallModel;   
 using HeimdallBusiness;
 
 namespace MotosApi.Controllers;
@@ -21,6 +21,14 @@ public class MotosController(MotoService motoService) : ControllerBase
         var moto = motoService.ObterPorId(id);
         return moto == null ? NotFound() : Ok(moto);
     }
+
+    [HttpGet("tipo")]
+public IActionResult GetPorTipo([FromQuery] string tipo)
+{
+    var moto = motoService.ObterPorTipo(tipo);
+    return moto == null ? NotFound() : Ok(moto);
+}
+
 
     [HttpPost]
     public IActionResult Post([FromBody] MotoModel moto)

@@ -8,6 +8,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddSingleton<MotoService>();
 var app = builder.Build();
 
