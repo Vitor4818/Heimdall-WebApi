@@ -1,43 +1,70 @@
-namespace HeimdallBusiness;
-using HeimdallModel; // Adicione isso no início do arquivo MotoService.cs
+using HeimdallModel;
+using HeimdallData; // referência ao seu DbContext
+using Microsoft.EntityFrameworkCore;
 
-
+namespace HeimdallBusiness
+{
     public class MotoService
     {
-        private static readonly List<MotoModel> _motos = new();
-        private static int _nextId = 1;
+        private readonly AppDbContext _context;
 
-        public List<MotoModel> ListarTodas() => _motos;
-
-        public MotoModel? ObterPorId(int id) => _motos.FirstOrDefault(m => m.id == id);
-        
-        public MotoModel? ObterPorTipo(string tipo) => _motos.FirstOrDefault(m=> m.tipoMoto == tipo);
-        public MotoModel Criar(MotoModel moto)
+        // Injetar o contexto de banco de dados
+        public MotoService(AppDbContext context)
         {
-            moto.id = _nextId++;
-            _motos.Add(moto);
-            return moto;
+            _context = context;
         }
 
+        // Método para listar todas as motos no banco de dados
+        public List<MotoModel> ListarTodas()
+        {
+            return _context.Moto.ToList();
+        }
+
+        // Método para obter uma moto por ID
+        public MotoModel? ObterPorId(int id)
+        {
+            return _context.Moto.Find(id); // Utiliza o Find para encontrar pela chave primária
+        }
+
+        // Método para obter uma moto pelo tipo
+        public MotoModel? ObterPorTipo(string tipo)
+        {
+            return _context.Moto.FirstOrDefault(m => m.tipoMoto == tipo); // Utiliza FirstOrDefault para buscar por tipo
+        }
+
+        // Método para cadastrar uma nova moto
+        public MotoModel CadastrarMoto(MotoModel moto)
+        {
+            _context.Moto.Add(moto); // Adiciona a moto ao DbSet
+            _context.SaveChanges(); // Persiste as mudanças no banco de dados
+            return moto; // Retorna a moto cadastrada
+        }
+
+        // Método para atualizar uma moto existente
         public bool Atualizar(MotoModel moto)
         {
-            var existente = ObterPorId(moto.id);
-            if (existente == null) return false;
+            var existente = _context.Moto.Find(moto.id); // Encontra a moto no banco pelo ID
+            if (existente == null) return false; // Se não encontrar, retorna falso
 
+            // Atualiza os dados da moto existente
             existente.tipoMoto = moto.tipoMoto;
             existente.placa = moto.placa;
             existente.numChassi = moto.numChassi;
 
-            return true;
+            _context.Moto.Update(existente); // Atualiza a moto no DbSet
+            _context.SaveChanges(); // Persiste as mudanças no banco de dados
+            return true; // Retorna verdadeiro indicando que a atualização foi bem-sucedida
         }
 
+        // Método para remover uma moto do banco
         public bool Remover(int id)
         {
-            var moto = ObterPorId(id);
-            if (moto == null) return false;
+            var moto = _context.Moto.Find(id); // Encontra a moto pelo ID
+            if (moto == null) return false; // Se não encontrar, retorna falso
 
-            _motos.Remove(moto);
-            return true;
+            _context.Moto.Remove(moto); // Remove a moto do DbSet
+            _context.SaveChanges(); // Persiste as mudanças no banco de dados
+            return true; // Retorna verdadeiro indicando que a remoção foi bem-sucedida
         }
     }
-
+}

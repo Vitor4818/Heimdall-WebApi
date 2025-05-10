@@ -1,8 +1,10 @@
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallBusiness.deps.json
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallBusiness.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallBusiness.pdb
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallData.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallModel.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallModel.pdb
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\bin\Debug\net9.0\HeimdallData.pdb
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\obj\Debug\net9.0\HeimdallBusiness.csproj.AssemblyReference.cache
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\obj\Debug\net9.0\HeimdallBusiness.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\HeimdallBusiness\obj\Debug\net9.0\HeimdallBusiness.AssemblyInfoInputs.cache

@@ -3,6 +3,7 @@
 
 <ItemGroup>
   <ProjectReference Include="..\HeimdallModel\HeimdallModel.csproj" />
+  <ProjectReference Include="..\HeimdallData\HeimdallData.csproj" />
 </ItemGroup> 
 
 

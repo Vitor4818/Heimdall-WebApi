@@ -36,7 +36,7 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
         if (string.IsNullOrWhiteSpace(moto.tipoMoto) || string.IsNullOrWhiteSpace(moto.placa))
             return BadRequest("Tipo da moto e placa são obrigatórios.");
 
-        var criada = motoService.Criar(moto);
+        var criada = motoService.CadastrarMoto(moto);
         return CreatedAtAction(nameof(Get), new { id = criada.id }, criada);
     }
 

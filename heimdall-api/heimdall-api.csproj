@@ -9,11 +9,19 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   
 
   
     <ProjectReference Include="..\HeimdallBusiness\HeimdallBusiness.csproj" />
     <ProjectReference Include="..\HeimdallModel\HeimdallModel.csproj" />
+    <ProjectReference Include="..\HeimdallData\HeimdallData.csproj" />
   </ItemGroup>
+
+
+ 
 
 </Project>
