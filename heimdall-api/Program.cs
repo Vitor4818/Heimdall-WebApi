@@ -1,31 +1,46 @@
 using HeimdallBusiness;
 using Microsoft.EntityFrameworkCore;
 using HeimdallData;
+using System.Text.Json.Serialization;
+using Redoc.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddOpenApi();
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddScoped<UsuarioService>();
-builder.Services.AddScoped<MotoService>(); // Alterar de Singleton para Scoped
 
-// Configuração do DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations(); 
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Heimdall API",
+        Version = "v1",
+        Description = "API para gerenciar motos, usuários e RFID."
+    });
+});
+
+
+builder.Services.AddScoped<TagRfidService>();
+builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<MotoService>(); 
+
+
+builder.Services.AddControllers().AddJsonOptions(x =>
+    x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+
 var app = builder.Build();
 
-// Verificando a conexão com o banco de dados
+
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
-        // Tenta conectar ao banco
         if (dbContext.Database.CanConnect())
         {
             Console.WriteLine("Conexão com o banco de dados bem-sucedida!");
@@ -41,13 +56,28 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+ 
+    app.UseSwagger();
+
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Heimdall API v1");
+    c.RoutePrefix = "swagger";  
+});
+
+    app.UseReDoc(c =>
+    {
+        c.SpecUrl("/swagger/v1/swagger.json"); 
+        c.RoutePrefix = "docs"; 
+    });
 }
 
 app.UseHttpsRedirection();
 
+
 app.MapControllers();
+
 app.Run();

@@ -34,6 +34,11 @@ C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Mi
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Mono.TextTemplating.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Oracle.EntityFrameworkCore.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Oracle.ManagedDataAccess.dll
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Redoc.AspNetCore.dll
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Annotations.dll
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\System.CodeDom.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\System.Composition.AttributedModel.dll
 C:\Users\vitor\Documents\.NET fiap\heimdall-api\heimdall-api\bin\Debug\net9.0\System.Composition.Convention.dll
