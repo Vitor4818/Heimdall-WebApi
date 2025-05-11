@@ -1,5 +1,5 @@
 using HeimdallModel;
-using HeimdallData; // referência ao seu DbContext
+using HeimdallData; 
 using Microsoft.EntityFrameworkCore;
 
 namespace HeimdallBusiness
