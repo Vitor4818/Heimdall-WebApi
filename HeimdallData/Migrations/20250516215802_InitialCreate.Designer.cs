@@ -11,7 +11,7 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace HeimdallData.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250515234619_InitialCreate")]
+    [Migration("20250516215802_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -23,6 +23,35 @@ namespace HeimdallData.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("HeimdallModel.CategoriaUsuarioModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("NUMBER(10)");
+
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR2(2000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CategoriasUsuario");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Nome = "Administrador"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Nome = "Usuário"
+                        });
+                });
 
             modelBuilder.Entity("HeimdallModel.MotoModel", b =>
                 {
@@ -88,7 +117,7 @@ namespace HeimdallData.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int>("CategoriaUsuario")
+                    b.Property<int>("CategoriaUsuarioId")
                         .HasColumnType("NUMBER(10)");
 
                     b.Property<string>("Cpf")
@@ -117,6 +146,8 @@ namespace HeimdallData.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("CategoriaUsuarioId");
+
                     b.ToTable("Usuarios");
                 });
 
@@ -129,6 +160,22 @@ namespace HeimdallData.Migrations
                         .IsRequired();
 
                     b.Navigation("Moto");
+                });
+
+            modelBuilder.Entity("HeimdallModel.UsuarioModel", b =>
+                {
+                    b.HasOne("HeimdallModel.CategoriaUsuarioModel", "CategoriaUsuario")
+                        .WithMany("Usuarios")
+                        .HasForeignKey("CategoriaUsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CategoriaUsuario");
+                });
+
+            modelBuilder.Entity("HeimdallModel.CategoriaUsuarioModel", b =>
+                {
+                    b.Navigation("Usuarios");
                 });
 
             modelBuilder.Entity("HeimdallModel.MotoModel", b =>

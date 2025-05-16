@@ -2,6 +2,8 @@
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace HeimdallData.Migrations
 {
     /// <inheritdoc />
@@ -10,6 +12,19 @@ namespace HeimdallData.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "CategoriasUsuario",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
+                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
+                    Nome = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CategoriasUsuario", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Moto",
                 columns: table => new
@@ -31,7 +46,7 @@ namespace HeimdallData.Migrations
                 {
                     id = table.Column<int>(type: "NUMBER(10)", nullable: false)
                         .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    CategoriaUsuario = table.Column<int>(type: "NUMBER(10)", nullable: false),
+                    CategoriaUsuarioId = table.Column<int>(type: "NUMBER(10)", nullable: false),
                     Nome = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     Sobrenome = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
                     DataNascimento = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
@@ -42,6 +57,12 @@ namespace HeimdallData.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Usuarios", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_Usuarios_CategoriasUsuario_CategoriaUsuarioId",
+                        column: x => x.CategoriaUsuarioId,
+                        principalTable: "CategoriasUsuario",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -66,11 +87,25 @@ namespace HeimdallData.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "CategoriasUsuario",
+                columns: new[] { "Id", "Nome" },
+                values: new object[,]
+                {
+                    { 1, "Administrador" },
+                    { 2, "Usuário" }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_TagsRfid_MotoId",
                 table: "TagsRfid",
                 column: "MotoId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Usuarios_CategoriaUsuarioId",
+                table: "Usuarios",
+                column: "CategoriaUsuarioId");
         }
 
         /// <inheritdoc />
@@ -84,6 +119,9 @@ namespace HeimdallData.Migrations
 
             migrationBuilder.DropTable(
                 name: "Moto");
+
+            migrationBuilder.DropTable(
+                name: "CategoriasUsuario");
         }
     }
 }

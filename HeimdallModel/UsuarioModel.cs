@@ -2,7 +2,8 @@ namespace HeimdallModel;
 
 public class UsuarioModel{
     public required int id {get; set;}
-    public required CategoriaUsuario CategoriaUsuario { get; set;}
+    public int CategoriaUsuarioId { get; set; }
+    public CategoriaUsuarioModel? CategoriaUsuario { get; set;}
     public required string Nome { get; set;}
     public required string Sobrenome { get; set;}
     public required string DataNascimento { get; set;}

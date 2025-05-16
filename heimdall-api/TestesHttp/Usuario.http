@@ -9,8 +9,8 @@ POST {{baseUrl}}/api/Usuario
 Content-Type: application/json
 
 {
-  "id": 0,
-  "categoriaUsuario": 0,
+  "id": 1,
+  "categoriaUsuarioId": 1,
   "nome": "João",
   "sobrenome": "Silva",
   "dataNascimento": "2000-05-10",
@@ -18,7 +18,6 @@ Content-Type: application/json
   "email": "joao.silva@example.com",
   "senha": "123456"
 }
-
 ### 🟡 GET - Obter usuário por ID
 GET {{baseUrl}}/api/Usuario/1
 Accept: application/json
@@ -29,13 +28,13 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "categoriaUsuario": 1,
-  "nome": "João Atualizado",
-  "sobrenome": "Silva",
+  "categoriaUsuarioId": 1,
+  "nome": "João",
+  "sobrenome": "Souza",
   "dataNascimento": "2000-05-10",
   "cpf": "12345678900",
-  "email": "joao.silva@update.com",
-  "senha": "novaSenha123"
+  "email": "joao.silva@example.com",
+  "senha": "1a"
 }
 
 ### 🔴 DELETE - Remover usuário por ID
