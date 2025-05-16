@@ -11,8 +11,8 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace HeimdallData.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250511022851_CreateTagsTable")]
-    partial class CreateTagsTable
+    [Migration("20250515234619_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -133,8 +133,7 @@ namespace HeimdallData.Migrations
 
             modelBuilder.Entity("HeimdallModel.MotoModel", b =>
                 {
-                    b.Navigation("TagRfid")
-                        .IsRequired();
+                    b.Navigation("TagRfid");
                 });
 #pragma warning restore 612, 618
         }

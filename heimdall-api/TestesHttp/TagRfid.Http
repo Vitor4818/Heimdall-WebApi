@@ -1,0 +1,37 @@
+@baseUrl = http://localhost:5044
+
+### 🟢 GET - Listar todas as tags RFID
+GET {{baseUrl}}/api/tagrfid
+Accept: application/json
+
+### 🔵 POST - Cadastrar nova tag RFID
+POST {{baseUrl}}/api/tagrfid
+Content-Type: application/json
+
+{
+  "id": 1,
+  "motoId": 1,
+  "faixaFrequencia": "915 MHz",
+  "banda": "UHF",
+  "aplicacao": "Controle de acesso"
+}
+
+### 🟡 GET - Obter tag RFID por ID
+GET {{baseUrl}}/api/tagrfid/1
+Accept: application/json
+
+### 🟣 PUT - Atualizar tag RFID por ID
+PUT {{baseUrl}}/api/tagrfid/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "motoId": 1,
+  "faixaFrequencia": "920 MHz",
+  "banda": "UHF",
+  "aplicacao": "Monitoramento de frota"
+}
+
+### 🔴 DELETE - Remover tag RFID por ID
+DELETE {{baseUrl}}/api/tagrfid/1
+Accept: application/json

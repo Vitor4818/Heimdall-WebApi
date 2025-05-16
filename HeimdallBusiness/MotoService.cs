@@ -24,7 +24,6 @@ public List<MotoModel> ListarTodas()
     return motos;
 }
 
-
         public MotoModel? ObterPorId(int id)
         {
             return _context.Moto.Find(id); 

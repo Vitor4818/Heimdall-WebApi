@@ -12,7 +12,7 @@ namespace HeimdallBusiness
         {
             _context = context;
         }
-       
+    
        public List<TagRfidModel> ListarTags()
        {
         return _context.TagsRfid.ToList();

@@ -130,8 +130,7 @@ namespace HeimdallData.Migrations
 
             modelBuilder.Entity("HeimdallModel.MotoModel", b =>
                 {
-                    b.Navigation("TagRfid")
-                        .IsRequired();
+                    b.Navigation("TagRfid");
                 });
 #pragma warning restore 612, 618
         }

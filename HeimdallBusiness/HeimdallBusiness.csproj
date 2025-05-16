@@ -4,6 +4,7 @@
 <ItemGroup>
   <ProjectReference Include="..\HeimdallModel\HeimdallModel.csproj" />
   <ProjectReference Include="..\HeimdallData\HeimdallData.csproj" />
+  <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.4" />
 </ItemGroup> 
 
 

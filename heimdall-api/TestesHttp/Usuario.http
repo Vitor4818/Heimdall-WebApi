@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:5044
+
+### 🟢 GET - Listar todos os usuários
+GET {{baseUrl}}/api/usuario
+Accept: application/json
+
+### 🔵 POST - Cadastrar novo usuário
+POST {{baseUrl}}/api/Usuario
+Content-Type: application/json
+
+{
+  "id": 0,
+  "categoriaUsuario": 0,
+  "nome": "João",
+  "sobrenome": "Silva",
+  "dataNascimento": "2000-05-10",
+  "cpf": "12345678900",
+  "email": "joao.silva@example.com",
+  "senha": "123456"
+}
+
+### 🟡 GET - Obter usuário por ID
+GET {{baseUrl}}/api/Usuario/1
+Accept: application/json
+
+### 🟣 PUT - Atualizar usuário por ID
+PUT {{baseUrl}}/api/Usuario/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "categoriaUsuario": 1,
+  "nome": "João Atualizado",
+  "sobrenome": "Silva",
+  "dataNascimento": "2000-05-10",
+  "cpf": "12345678900",
+  "email": "joao.silva@update.com",
+  "senha": "novaSenha123"
+}
+
+### 🔴 DELETE - Remover usuário por ID
+DELETE {{baseUrl}}/api/Usuario/1
+Accept: application/json
+
+### 🔍 GET - Obter usuário por nome
+GET {{baseUrl}}/api/Usuario/nome?nome=João
+Accept: application/json

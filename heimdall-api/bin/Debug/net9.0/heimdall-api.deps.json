@@ -767,7 +767,8 @@
       "HeimdallBusiness/1.0.0": {
         "dependencies": {
           "HeimdallData": "1.0.0",
-          "HeimdallModel": "1.0.0"
+          "HeimdallModel": "1.0.0",
+          "Microsoft.EntityFrameworkCore.Relational": "9.0.4"
         },
         "runtime": {
           "HeimdallBusiness.dll": {

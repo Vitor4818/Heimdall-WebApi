@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:5044
+
+### 🟢 GET - Listar todas as motos
+GET {{baseUrl}}/api/Motos
+Accept: application/json
+
+### 🟡 GET - Obter moto por ID
+GET {{baseUrl}}/api/Motos/1
+Accept: application/json
+
+### 🔵 POST - Cadastrar nova moto
+POST {{baseUrl}}/api/Motos
+Content-Type: application/json
+
+{
+  "id": 1,
+  "tipoMoto": "Esportiva",
+  "placa": "ABC1234",
+  "numChassi": "1234567F"
+}
+
+### 🟣 PUT - Atualizar moto por ID
+PUT {{baseUrl}}/api/Motos/1
+Content-Type: application/json
+
+{
+  "id": 1,
+  "tipoMoto": "Casual",
+  "placa": "ABC1234",
+  "numChassi": "1234567F"
+}
+
+### 🔴 DELETE - Remover moto por ID
+DELETE {{baseUrl}}/api/Motos/1
+Accept: application/json
