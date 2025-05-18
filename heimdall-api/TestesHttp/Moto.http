@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:5044
+@baseUrl = http://localhost:5000
 
 ### 🟢 GET - Listar todas as motos
 GET {{baseUrl}}/api/Motos
@@ -13,7 +13,7 @@ POST {{baseUrl}}/api/Motos
 Content-Type: application/json
 
 {
-  "id": 1,
+  "id": 6,
   "tipoMoto": "Esportiva",
   "placa": "ABC1234",
   "numChassi": "1234567F"
