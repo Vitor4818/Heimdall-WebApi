@@ -35,46 +35,29 @@ A arquitetura segue os padrões modernos, com **injeção de dependência** e **
 ---
 
 ## ⚙️ Como Executar
+### Executar com Docker (Local, sem azure)
+Esse método permite rodar a API localmente em um container Docker.
 
-1. **Clonar o repositório:**
-   ```bash
-   git clone https://github.com/Vitor4818/Heimdall-WebApi.git
+### ✅ Pré-requisitos
+Docker instalado: https://www.docker.com/products/docker-desktop
 
-2. **Restaurar pacotes:**  Abra o heimdall-api.sln no Visual Studio ou use:
-```bash
-dotnet restore
+📦 1. Clonar o Repositório
 ```
-3. **Configurar o Oracle**
-
-No arquivo `appsettings.json` do projeto `heimdall-api`, configure a **string de conexão** com os seguintes dados:
-
-- `usuário`  
-- `senha`  
-- `host`  
-- `serviço`
-
-Exemplo:
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "User Id=SEU_USUARIO;Password=SUA_SENHA;Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=SEU_HOST)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=SEU_SERVICO)));"
-}
+git clone https://github.com/Vitor4818/Heimdall-WebApi.git
+cd Heimdall-WebApi
 ```
-4. **Aplicar as Migrações**
-   Abra o terminal e execute:
-
-```bash
-dotnet ef database update --startup-project heimdall-api --project HeimdallData
+🛠️ 2. Buildar a Imagem Docker
 ```
-
- 5. Rodar a Aplicação
-    Execute o seguinte comando:
-
-```bash
-cd heimdall-api
-dotnet run webapi
+docker build -t heimdall-webapi:1.0 .
 ```
----
+🚀 3. Rodar o Container
+Substitua a string de conexão pela sua:
+
+```
+docker run -d -p 5000:5000 --name heimdall-webapi-container -e ConnectionStrings__DefaultConnection='User Id=SEU_USUARIO;Password=SUA_SENHA;Data Source=' heimdall-webapi:1.0
+```
+📝 A variável de ambiente ConnectionStrings__DefaultConnection é usada para configurar a string de conexão com o banco Oracle.
+
 ## 📚 Acessar Documentação
 
 - **Swagger**: [https://localhost:{porta}/swagger](https://localhost:{porta}/swagger)  
@@ -210,31 +193,3 @@ Exemplo
 ``` 
 @baseUrl = http://20.206.107.120:5000
 ```
-
-
-# 🐳 Executar com Docker (Local, sem azure)
-Esse método permite rodar a API localmente em um container Docker.
-
-### ✅ Pré-requisitos
-Docker instalado: https://www.docker.com/products/docker-desktop
-
-📦 1. Clonar o Repositório
-```
-git clone https://github.com/Vitor4818/Heimdall-WebApi.git
-cd Heimdall-WebApi
-```
-🛠️ 2. Buildar a Imagem Docker
-```
-docker build -t heimdall-webapi:1.0 .
-```
-🚀 3. Rodar o Container
-Substitua a string de conexão pela sua:
-
-```
-docker run -d \
-  -p 5000:5000 \
-  --name heimdall-webapi-container \
-  -e ConnectionStrings__DefaultConnection='User Id=SEU_USUARIO;Password=SUA_SENHA;Data Source=' \
-  heimdall-webapi:1.0
-```
-📝 A variável de ambiente ConnectionStrings__DefaultConnection é usada para configurar a string de conexão com o banco Oracle.
