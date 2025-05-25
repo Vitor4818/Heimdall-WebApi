@@ -1,11 +1,11 @@
-@baseUrl = http://localhost:5000
+@baseUrl = http://20.195.178.24:5000
 
 ### 🟢 GET - Listar todas as motos
 GET {{baseUrl}}/api/Motos
 Accept: application/json
 
 ### 🟡 GET - Obter moto por ID
-GET {{baseUrl}}/api/Motos/1
+GET {{baseUrl}}/api/Motos/11
 Accept: application/json
 
 ### 🔵 POST - Cadastrar nova moto
@@ -13,7 +13,7 @@ POST {{baseUrl}}/api/Motos
 Content-Type: application/json
 
 {
-  "id": 6,
+  "id": 11,
   "tipoMoto": "Esportiva",
   "placa": "ABC1234",
   "numChassi": "1234567F"

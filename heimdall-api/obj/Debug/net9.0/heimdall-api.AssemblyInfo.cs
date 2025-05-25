@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("heimdall-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+321a4e038aa67130c160ecec7005b9ecf0920ae5")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4b5e1661e65e6473065e24e63768f0d171763c0")]
 [assembly: System.Reflection.AssemblyProductAttribute("heimdall-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("heimdall-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
