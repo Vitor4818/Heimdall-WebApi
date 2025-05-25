@@ -1,5 +1,3 @@
-﻿﻿# Heimdall Web API 🛡️
-
 ## 🎯 Objetivo
 
 A **Heimdall Web API** é uma API RESTful desenvolvida com **ASP.NET Core** para gerenciamento de:
