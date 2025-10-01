@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "CvMR2bn5F6Y=",
+  "dgSpecHash": "6iTDeLxkDZA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\heimdall-api\\heimdall-api.csproj",
+  "projectFilePath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\heimdall-api\\heimdall-api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.2\\microsoft.aspnetcore.openapi.9.0.2.nupkg.sha512",

@@ -15,20 +15,63 @@ public class MotosController : ControllerBase
         this.motoService = motoService;
     }
 
-    [HttpGet]
-    [SwaggerOperation(
-        Summary = "Lista todas as motos",
-        Description = "Retorna uma lista de todas as motos cadastradas. Caso não haja motos, retorna 204 No Content.",
-        OperationId = "GetAllMotos",
-        Tags = new[] { "Moto" }
-    )]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public IActionResult Get()
+   [HttpGet]
+[SwaggerOperation(
+    Summary = "Lista todas as motos",
+    Description = "Retorna uma lista paginada de todas as motos cadastradas. Caso não haja motos, retorna 204 No Content.",
+    OperationId = "GetAllMotos",
+    Tags = new[] { "Moto" }
+)]
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status204NoContent)]
+public IActionResult Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+{
+    if (page <= 0) page = 1;
+    if (pageSize <= 0) pageSize = 10;
+
+    var allMotos = motoService.ListarTodas();
+    if (!allMotos.Any()) return NoContent();
+
+    var totalItems = allMotos.Count;
+    var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+    var motosPage = allMotos
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(m => new
+        {
+            m.id,
+            m.tipoMoto,
+            m.placa,
+            m.numChassi,
+            links = new
+            {
+                self = Url.Action(nameof(Get), new { id = m.id }),
+                update = Url.Action(nameof(Put), new { id = m.id }),
+                delete = Url.Action(nameof(Delete), new { id = m.id }),
+                all = Url.Action(nameof(Get))
+            }
+        })
+        .Cast<object>() // força para object, compatível com PagedResultDto<object>
+        .ToList();
+
+    var result = new PagedResultDto<object>
     {
-        var motos = motoService.ListarTodas();
-        return motos.Count == 0 ? NoContent() : Ok(motos);
-    }
+        Page = page,
+        PageSize = pageSize,
+        TotalPages = totalPages,
+        TotalItems = totalItems,
+        Links = new
+        {
+            self = Url.Action(nameof(Get), new { page, pageSize }),
+            next = page < totalPages ? Url.Action(nameof(Get), new { page = page + 1, pageSize }) : null,
+            prev = page > 1 ? Url.Action(nameof(Get), new { page = page - 1, pageSize }) : null
+        },
+        Items = motosPage
+    };
+
+    return Ok(result);
+}
 
     [HttpGet("{id}")]
     [SwaggerOperation(
@@ -42,7 +85,22 @@ public class MotosController : ControllerBase
     public IActionResult Get(int id)
     {
         var moto = motoService.ObterPorId(id);
-        return moto == null ? NotFound() : Ok(moto);
+        if (moto == null) return NotFound();
+
+        var resultado = new {
+            moto.id,
+            moto.tipoMoto,
+            moto.placa,
+            moto.numChassi,
+            links = new {
+                all = Url.Action(nameof(Get)),
+                self = Url.Action(nameof(Get), new { id = moto.id }),
+                update = Url.Action(nameof(Put), new { id = moto.id }),
+                delete = Url.Action(nameof(Delete), new { id = moto.id })
+            }
+        };
+
+        return Ok(resultado);
     }
 
     [HttpGet("tipo")]
@@ -54,11 +112,25 @@ public class MotosController : ControllerBase
     )]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetPorTipo([FromQuery] string tipo)
-    {
-        var moto = motoService.ObterPorTipo(tipo);
-        return moto == null ? NotFound() : Ok(moto);
-    }
+public IActionResult GetPorTipo([FromQuery] string tipo)
+{
+    var moto = motoService.ObterPorTipo(tipo);
+    if (moto == null) return NotFound();
+
+    var resultado = new {
+        moto.id,
+        moto.tipoMoto,
+        moto.placa,
+        moto.numChassi,
+        links = new {
+            self = Url.Action(nameof(Get), new { id = moto.id }),
+            update = Url.Action(nameof(Put), new { id = moto.id }),
+            delete = Url.Action(nameof(Delete), new { id = moto.id })
+        }
+    };
+
+    return Ok(resultado);
+}
 
     [HttpPost]
     [SwaggerOperation(
@@ -75,7 +147,21 @@ public class MotosController : ControllerBase
             return BadRequest("Tipo da moto e placa são obrigatórios.");
 
         var criada = motoService.CadastrarMoto(moto);
-        return CreatedAtAction(nameof(Get), new { id = criada.id }, criada);
+
+        var resultado = new {
+            criada.id,
+            criada.tipoMoto,
+            criada.placa,
+            criada.numChassi,
+            links = new {
+                self = Url.Action(nameof(Get), new { id = criada.id }),
+                update = Url.Action(nameof(Put), new { id = criada.id }),
+                delete = Url.Action(nameof(Delete), new { id = criada.id }),
+                all = Url.Action(nameof(Get))
+            }
+        };
+
+        return CreatedAtAction(nameof(Get), new { id = criada.id }, resultado);
     }
 
     [HttpPut("{id}")]

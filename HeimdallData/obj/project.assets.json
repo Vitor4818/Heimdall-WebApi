@@ -3335,11 +3335,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallData\\HeimdallData.csproj",
+      "projectUniqueName": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallData\\HeimdallData.csproj",
       "projectName": "HeimdallData",
-      "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallData\\HeimdallData.csproj",
+      "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallData\\HeimdallData.csproj",
       "packagesPath": "C:\\Users\\Vitor Gomes\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallData\\obj\\",
+      "outputPath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallData\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Vitor Gomes\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -3354,8 +3354,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj": {
-              "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj"
+            "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\HeimdallModel.csproj": {
+              "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\HeimdallModel.csproj"
             }
           }
         }

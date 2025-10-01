@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "NjEDbQ/FEeU=",
+  "dgSpecHash": "1kKVSaibrC0=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallData\\HeimdallData.csproj",
+  "projectFilePath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallData\\HeimdallData.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",

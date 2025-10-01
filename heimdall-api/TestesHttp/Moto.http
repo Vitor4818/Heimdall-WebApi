@@ -1,4 +1,4 @@
-@baseUrl = http://20.195.178.24:5000
+@baseUrl = http://localhost:5000
 
 ### 🟢 GET - Listar todas as motos
 GET {{baseUrl}}/api/Motos
