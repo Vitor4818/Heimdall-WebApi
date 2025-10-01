@@ -696,6 +696,40 @@
           "buildTransitive/Mono.TextTemplating.targets": {}
         }
       },
+      "Npgsql/9.0.3": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.2"
+        },
+        "compile": {
+          "lib/net8.0/Npgsql.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Npgsql.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Npgsql.EntityFrameworkCore.PostgreSQL/9.0.4": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore": "[9.0.1, 10.0.0)",
+          "Microsoft.EntityFrameworkCore.Relational": "[9.0.1, 10.0.0)",
+          "Npgsql": "9.0.3"
+        },
+        "compile": {
+          "lib/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Oracle.EntityFrameworkCore/9.23.80": {
         "type": "package",
         "dependencies": {
@@ -1229,6 +1263,7 @@
         "dependencies": {
           "HeimdallModel": "1.0.0",
           "Microsoft.EntityFrameworkCore": "9.0.4",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Oracle.EntityFrameworkCore": "9.23.80"
         },
         "compile": {
@@ -2952,6 +2987,38 @@
         "readme.md"
       ]
     },
+    "Npgsql/9.0.3": {
+      "sha512": "tPvY61CxOAWxNsKLEBg+oR646X4Bc8UmyQ/tJszL/7mEmIXQnnBhVJZrZEEUv0Bstu0mEsHZD5At3EO8zQRAYw==",
+      "type": "package",
+      "path": "npgsql/9.0.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net6.0/Npgsql.dll",
+        "lib/net6.0/Npgsql.xml",
+        "lib/net8.0/Npgsql.dll",
+        "lib/net8.0/Npgsql.xml",
+        "npgsql.9.0.3.nupkg.sha512",
+        "npgsql.nuspec",
+        "postgresql.png"
+      ]
+    },
+    "Npgsql.EntityFrameworkCore.PostgreSQL/9.0.4": {
+      "sha512": "mw5vcY2IEc7L+IeGrxpp/J5OSnCcjkjAgJYCm/eD52wpZze8zsSifdqV7zXslSMmfJG2iIUGZyo3KuDtEFKwMQ==",
+      "type": "package",
+      "path": "npgsql.entityframeworkcore.postgresql/9.0.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.dll",
+        "lib/net8.0/Npgsql.EntityFrameworkCore.PostgreSQL.xml",
+        "npgsql.entityframeworkcore.postgresql.9.0.4.nupkg.sha512",
+        "npgsql.entityframeworkcore.postgresql.nuspec",
+        "postgresql.png"
+      ]
+    },
     "Oracle.EntityFrameworkCore/9.23.80": {
       "sha512": "NFzCoYs/0fQXZRSqB0v9ZlOVZe84U5MqMgrhcJeyR/0+5FzSe9oBbu87Tz3SaoQWrrMjGGsQHbQD89o0AHUpzQ==",
       "type": "package",
@@ -3781,52 +3848,45 @@
       "HeimdallModel >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 9.0.2",
       "Microsoft.EntityFrameworkCore.Design >= 9.0.4",
+      "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4",
       "Redoc.AspNetCore >= 1.0.0",
       "Swashbuckle.AspNetCore >= 8.1.1",
       "Swashbuckle.AspNetCore.Annotations >= 8.1.1"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\vitor\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\Vitor Gomes\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\heimdall-api\\heimdall-api.csproj",
+      "projectUniqueName": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\heimdall-api\\heimdall-api.csproj",
       "projectName": "heimdall-api",
-      "projectPath": "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\heimdall-api\\heimdall-api.csproj",
-      "packagesPath": "C:\\Users\\vitor\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\heimdall-api\\obj\\",
+      "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\heimdall-api\\heimdall-api.csproj",
+      "packagesPath": "C:\\Users\\Vitor Gomes\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\heimdall-api\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\vitor\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\Vitor Gomes\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\HeimdallBusiness\\HeimdallBusiness.csproj": {
-              "projectPath": "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\HeimdallBusiness\\HeimdallBusiness.csproj"
+            "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallBusiness\\HeimdallBusiness.csproj": {
+              "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallBusiness\\HeimdallBusiness.csproj"
             },
-            "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\HeimdallData\\HeimdallData.csproj": {
-              "projectPath": "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\HeimdallData\\HeimdallData.csproj"
+            "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallData\\HeimdallData.csproj": {
+              "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallData\\HeimdallData.csproj"
             },
-            "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\HeimdallModel\\HeimdallModel.csproj": {
-              "projectPath": "C:\\Users\\vitor\\Documents\\.NET fiap\\heimdall-api\\HeimdallModel\\HeimdallModel.csproj"
+            "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj": {
+              "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj"
             }
           }
         }
@@ -3841,7 +3901,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net9.0": {
@@ -3854,6 +3914,10 @@
           "Microsoft.EntityFrameworkCore.Design": {
             "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
             "suppressParent": "All",
+            "target": "Package",
+            "version": "[9.0.4, )"
+          },
+          "Npgsql.EntityFrameworkCore.PostgreSQL": {
             "target": "Package",
             "version": "[9.0.4, )"
           },
@@ -3889,7 +3953,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

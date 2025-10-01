@@ -6,11 +6,11 @@ using Redoc.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Configuração do DbContext com PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
+// Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -24,25 +24,28 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
+// Injeção de dependências
 builder.Services.AddScoped<TagRfidService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MotoService>(); 
-
 
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 var app = builder.Build();
 
+// Aplica migrations automaticamente e verifica a conexão
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     try
     {
+        // Aplica migrations pendentes
+        dbContext.Database.Migrate();
+
         if (dbContext.Database.CanConnect())
         {
-            Console.WriteLine("Conexão com o banco de dados bem-sucedida!");
+            Console.WriteLine("Conexão com o banco de dados bem-sucedida e migrations aplicadas!");
         }
         else
         {
@@ -51,25 +54,21 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Erro ao conectar ao banco de dados: {ex.Message}");
+        Console.WriteLine($"Erro ao conectar ou migrar o banco de dados: {ex.Message}");
     }
 }
-//Inserido DatabaseSeeder para criar dados exemplares ao conectar no banco
-//Só ira chamar o DbSeeder, caso não tenha nenhum registro na tabela de motos
+
+// Seed inicial (após aplicar migrations)
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     DbSeeder.SeedMotos(context);
 }
 
-
-
-
+// Configuração do Swagger/ReDoc para Development
 if (app.Environment.IsDevelopment())
 {
-
     app.UseSwagger();
-
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Heimdall API v1");
@@ -84,7 +83,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 
 app.MapControllers();
 app.Urls.Add("http://0.0.0.0:5000");

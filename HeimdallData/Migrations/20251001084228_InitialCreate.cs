@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,9 +17,9 @@ namespace HeimdallData.Migrations
                 name: "CategoriasUsuario",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    Nome = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Nome = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,11 +30,11 @@ namespace HeimdallData.Migrations
                 name: "Moto",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    tipoMoto = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    placa = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    numChassi = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    tipoMoto = table.Column<string>(type: "text", nullable: false),
+                    placa = table.Column<string>(type: "text", nullable: false),
+                    numChassi = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,15 +45,15 @@ namespace HeimdallData.Migrations
                 name: "Usuarios",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    CategoriaUsuarioId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    Nome = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Sobrenome = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    DataNascimento = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Cpf = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Email = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Senha = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CategoriaUsuarioId = table.Column<int>(type: "integer", nullable: false),
+                    Nome = table.Column<string>(type: "text", nullable: false),
+                    Sobrenome = table.Column<string>(type: "text", nullable: false),
+                    DataNascimento = table.Column<string>(type: "text", nullable: false),
+                    Cpf = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Senha = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -69,12 +70,12 @@ namespace HeimdallData.Migrations
                 name: "TagsRfid",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "NUMBER(10)", nullable: false)
-                        .Annotation("Oracle:Identity", "START WITH 1 INCREMENT BY 1"),
-                    MotoId = table.Column<int>(type: "NUMBER(10)", nullable: false),
-                    FaixaFrequencia = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Banda = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false),
-                    Aplicacao = table.Column<string>(type: "NVARCHAR2(2000)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    MotoId = table.Column<int>(type: "integer", nullable: false),
+                    FaixaFrequencia = table.Column<string>(type: "text", nullable: false),
+                    Banda = table.Column<string>(type: "text", nullable: false),
+                    Aplicacao = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
