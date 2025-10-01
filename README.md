@@ -20,6 +20,8 @@ A arquitetura segue os padrões modernos, com **injeção de dependência** e **
 | `HeimdallData`     | Camada de acesso a dados com EF Core + Postgres |
 | `HeimdallModel`    | Contém os modelos: `Moto`, `TagRfid`, `Usuario` |
 
+
+#### A Heimdall Web API adota arquitetura monolítica por ser simples de desenvolver, implantar e manter, atendendo ao escopo atual de CRUD de motos, usuários e tags RFID. Apesar de ser um único sistema, é modularizado em camadas (API, negócio, dados e modelos), garantindo organização e manutenção facilitada, com possibilidade de evolução futura para microserviços se necessário.
 ---
 
 ## 🚀 Tecnologias Utilizadas
