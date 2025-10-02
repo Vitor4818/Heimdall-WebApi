@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\HeimdallModel.csproj": {}
+    "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\HeimdallModel.csproj": {
+    "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\HeimdallModel.csproj",
+        "projectUniqueName": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj",
         "projectName": "HeimdallModel",
-        "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\HeimdallModel.csproj",
+        "projectPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\HeimdallModel.csproj",
         "packagesPath": "C:\\Users\\Vitor Gomes\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Vitor Gomes\\Documents\\heimdall-webapi\\HeimdallModel\\obj\\",
+        "outputPath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\HeimdallModel\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Vitor Gomes\\AppData\\Roaming\\NuGet\\NuGet.Config"
