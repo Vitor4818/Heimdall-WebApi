@@ -61,7 +61,7 @@ public class MotosController : ControllerBase
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        // Aqui pegamos um IQueryable para aplicar paginação direto no banco
+        
         var query = motoService.ListarTodas(); 
 
         var totalItems = await query.CountAsync();
