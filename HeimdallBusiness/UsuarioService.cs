@@ -13,9 +13,9 @@ namespace HeimdallBusiness
             _context = context;
         }
 
-        public List<UsuarioModel> ListarUsuario()
+        public IQueryable<UsuarioModel> ListarUsuario()
         {
-            return _context.Usuarios.ToList();
+            return _context.Usuarios.AsNoTracking().AsQueryable();
         }
 
         public UsuarioModel? ObterPorId(int id)

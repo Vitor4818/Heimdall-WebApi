@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "CvMR2bn5F6Y=",
+  "dgSpecHash": "+l+AtSTce1s=",
   "success": true,
   "projectFilePath": "C:\\Users\\Vitor Gomes\\Documents\\Heimdall-WebApi\\heimdall-api\\heimdall-api.csproj",
   "expectedPackageFiles": [
@@ -38,8 +38,11 @@
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\oracle.entityframeworkcore\\9.23.80\\oracle.entityframeworkcore.9.23.80.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\oracle.manageddataaccess.core\\23.8.0\\oracle.manageddataaccess.core.23.8.0.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\redoc.aspnetcore\\1.0.0\\redoc.aspnetcore.1.0.0.nupkg.sha512",
+    "C:\\Users\\Vitor Gomes\\.nuget\\packages\\scrutor\\3.3.0\\scrutor.3.3.0.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore\\8.1.1\\swashbuckle.aspnetcore.8.1.1.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore.annotations\\8.1.1\\swashbuckle.aspnetcore.annotations.8.1.1.nupkg.sha512",
+    "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore.filters\\9.0.1\\swashbuckle.aspnetcore.filters.9.0.1.nupkg.sha512",
+    "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore.filters.abstractions\\9.0.1\\swashbuckle.aspnetcore.filters.abstractions.9.0.1.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\8.1.1\\swashbuckle.aspnetcore.swagger.8.1.1.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\8.1.1\\swashbuckle.aspnetcore.swaggergen.8.1.1.nupkg.sha512",
     "C:\\Users\\Vitor Gomes\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\8.1.1\\swashbuckle.aspnetcore.swaggerui.8.1.1.nupkg.sha512",

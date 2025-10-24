@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using HeimdallModel;
 using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.EntityFrameworkCore;
+using HeimdallApi.Examples;
+using Swashbuckle.AspNetCore.Filters;
+
 
 namespace UsuariosApi.Controllers;
 
@@ -39,66 +43,70 @@ public class UsuarioController : ControllerBase
         };
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [SwaggerOperation(Summary = "Obtém todos os usuários", Description = "Retorna uma lista de todos os usuários cadastrados.")]
-public IActionResult Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-{
-    if (page <= 0) page = 1;
-    if (pageSize <= 0) pageSize = 10;
+    [SwaggerOperation(Summary = "Obtém todos os usuários", Description = "Retorna uma lista de todos os usuários cadastrados com paginação.")]
+    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UsuarioListResponseExample))]
 
-    var allUsuarios = usuarioService.ListarUsuario();
-    if (!allUsuarios.Any()) return NoContent();
-
-    var totalItems = allUsuarios.Count;
-    var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-    var usuariosPage = allUsuarios
-        .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .Select(u => new
-        {
-            u.id,
-            u.Nome,
-            u.Sobrenome,
-            u.DataNascimento,
-            u.Cpf,
-            u.Email,
-            links = new
-            {
-                self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { id = u.id }),
-                update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Usuario", new { id = u.id }),
-                delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Usuario", new { id = u.id }),
-                all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario")
-            }
-        })
-        .Cast<object>()
-        .ToList();
-
-    var result = new PagedResultDto<object>
+    public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
-        Page = page,
-        PageSize = pageSize,
-        TotalPages = totalPages,
-        TotalItems = totalItems,
-        Links = new
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        var query = usuarioService.ListarUsuario().AsNoTracking();
+
+        var totalItems = await query.CountAsync();
+        if (totalItems == 0)
+            return NoContent();
+
+        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        var usuariosPage = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        var usuariosComLinks = usuariosPage.Select(u => GetUsuarioResource(u)).ToList();
+
+        var result = new PagedResultDto<object>
         {
-            self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { page, pageSize }),
-            next = page < totalPages ? linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { page = page + 1, pageSize }) : null,
-            prev = page > 1 ? linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { page = page - 1, pageSize }) : null
-        },
-        Items = usuariosPage
-    };
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = totalPages,
+            TotalItems = totalItems,
+            Links = new
+            {
+                self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { page, pageSize }),
+                next = page < totalPages ? linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { page = page + 1, pageSize }) : null,
+                prev = page > 1 ? linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { page = page - 1, pageSize }) : null
+            },
+            Items = usuariosComLinks
+        };
 
-    return Ok(result);
-}
-
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = "Obtém um usuário pelo ID", Description = "Retorna os dados de um usuário específico pelo ID.")]
+    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(UsuarioExample))]
     public IActionResult Get(int id)
     {
         var usuario = usuarioService.ObterPorId(id);
@@ -119,6 +127,7 @@ public IActionResult Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(Summary = "Cadastra um novo usuário", Description = "Cadastra um novo usuário no sistema.")]
+    [SwaggerRequestExample(typeof(UsuarioModel), typeof(UsuarioExample))]
     public IActionResult Post([FromBody] UsuarioModel usuario)
     {
         if (string.IsNullOrWhiteSpace(usuario.Nome) ||
@@ -142,6 +151,7 @@ public IActionResult Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerOperation(Summary = "Atualiza os dados de um usuário", Description = "Atualiza os dados de um usuário existente.")]
+    [SwaggerRequestExample(typeof(UsuarioModel), typeof(UsuarioExample))]
     public IActionResult Put(int id, [FromBody] UsuarioModel usuario)
     {
         if (usuario == null || usuario.id != id)

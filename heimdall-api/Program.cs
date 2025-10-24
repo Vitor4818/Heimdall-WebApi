@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using HeimdallData;
 using System.Text.Json.Serialization;
 using Redoc.AspNetCore;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations(); 
@@ -22,12 +25,25 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API para gerenciar motos, usuários e RFID."
     });
+
+    // Habilita comentários XML
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+
+    // Habilita exemplos de payload
+    options.ExampleFilters();
 });
+
+// Registrando exemplos de payload no container
+builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>(); 
 
 // Injeção de dependências
 builder.Services.AddScoped<TagRfidService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MotoService>(); 
+builder.Services.AddScoped<AuthService>();
+
 
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);

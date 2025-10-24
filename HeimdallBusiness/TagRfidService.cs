@@ -13,9 +13,9 @@ namespace HeimdallBusiness
             _context = context;
         }
     
-       public List<TagRfidModel> ListarTags()
+       public IQueryable<TagRfidModel> ListarTags()
        {
-        return _context.TagsRfid.ToList();
+        return _context.TagsRfid.AsNoTracking().AsQueryable();
        }
 
        public TagRfidModel? ObterPorId(int id)

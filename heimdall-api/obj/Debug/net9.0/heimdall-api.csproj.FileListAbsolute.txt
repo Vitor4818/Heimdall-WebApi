@@ -300,3 +300,8 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\ref
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.pdb
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.genruntimeconfig.cache
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\ref\heimdall-api.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\heimdall-api.xml
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.xml
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Scrutor.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

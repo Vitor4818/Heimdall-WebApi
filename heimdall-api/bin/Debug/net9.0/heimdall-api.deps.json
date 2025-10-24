@@ -16,7 +16,8 @@
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "Redoc.AspNetCore": "1.0.0",
           "Swashbuckle.AspNetCore": "8.1.1",
-          "Swashbuckle.AspNetCore.Annotations": "8.1.1"
+          "Swashbuckle.AspNetCore.Annotations": "8.1.1",
+          "Swashbuckle.AspNetCore.Filters": "9.0.1"
         },
         "runtime": {
           "heimdall-api.dll": {}
@@ -584,6 +585,18 @@
           }
         }
       },
+      "Scrutor/3.3.0": {
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.4",
+          "Microsoft.Extensions.DependencyModel": "9.0.4"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/Scrutor.dll": {
+            "assemblyVersion": "3.0.2.0",
+            "fileVersion": "3.0.2.0"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/8.1.1": {
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "6.0.5",
@@ -600,6 +613,27 @@
           "lib/net9.0/Swashbuckle.AspNetCore.Annotations.dll": {
             "assemblyVersion": "8.1.1.0",
             "fileVersion": "8.1.1.1274"
+          }
+        }
+      },
+      "Swashbuckle.AspNetCore.Filters/9.0.1": {
+        "dependencies": {
+          "Scrutor": "3.3.0",
+          "Swashbuckle.AspNetCore.Filters.Abstractions": "9.0.1",
+          "Swashbuckle.AspNetCore.SwaggerGen": "8.1.1"
+        },
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Filters.dll": {
+            "assemblyVersion": "9.0.1.0",
+            "fileVersion": "9.0.1.0"
+          }
+        }
+      },
+      "Swashbuckle.AspNetCore.Filters.Abstractions/9.0.1": {
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll": {
+            "assemblyVersion": "9.0.1.0",
+            "fileVersion": "9.0.1.0"
           }
         }
       },
@@ -1063,6 +1097,13 @@
       "path": "redoc.aspnetcore/1.0.0",
       "hashPath": "redoc.aspnetcore.1.0.0.nupkg.sha512"
     },
+    "Scrutor/3.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BwqCnFzp2/Z+pq17iztxlIkR/ZANyPRR4PdE57WL1w/JW4AM/2imoxBWTL3+G+YXA46ce4s9OUgwWqTXYrtI8A==",
+      "path": "scrutor/3.3.0",
+      "hashPath": "scrutor.3.3.0.nupkg.sha512"
+    },
     "Swashbuckle.AspNetCore/8.1.1": {
       "type": "package",
       "serviceable": true,
@@ -1076,6 +1117,20 @@
       "sha512": "sha512-7HPeJGAs2VikmUOUHjmXo657FhUEuwajjgUmLTVrzGHo4tS1Io29cyMMfMDp4eAnXnY88jMa4MwG00xhWRgIDg==",
       "path": "swashbuckle.aspnetcore.annotations/8.1.1",
       "hashPath": "swashbuckle.aspnetcore.annotations.8.1.1.nupkg.sha512"
+    },
+    "Swashbuckle.AspNetCore.Filters/9.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Lg4oCXWDY7r34hxSz1EeOu25EDEpBqcwP5oIqtk3BKQ/id7Ur7U0jfpPZA2SJJsUFhaLWWAHuvI3I7IiZLc3Hg==",
+      "path": "swashbuckle.aspnetcore.filters/9.0.1",
+      "hashPath": "swashbuckle.aspnetcore.filters.9.0.1.nupkg.sha512"
+    },
+    "Swashbuckle.AspNetCore.Filters.Abstractions/9.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-t1fdkAb4PFK+6N1QhxwU2MVhgI7yua9yn7GK5nLxFlmHShXfoZg07qS4RiYua5ZmEJpzUOoHjNCDjHPATv4T1w==",
+      "path": "swashbuckle.aspnetcore.filters.abstractions/9.0.1",
+      "hashPath": "swashbuckle.aspnetcore.filters.abstractions.9.0.1.nupkg.sha512"
     },
     "Swashbuckle.AspNetCore.Swagger/8.1.1": {
       "type": "package",

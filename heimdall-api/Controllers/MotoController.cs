@@ -3,74 +3,99 @@ using HeimdallModel;
 using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;  
 namespace MotosApi.Controllers;
+using Microsoft.EntityFrameworkCore;
+using MotosApi.SwaggerExamples;
+using Swashbuckle.AspNetCore.Filters;
 
 [ApiController]
 [Route("api/[controller]")]
 public class MotosController : ControllerBase
 {
     private readonly MotoService motoService;
+    private readonly LinkGenerator linkGenerator;
 
-    public MotosController(MotoService motoService)
+    public MotosController(MotoService motoService, LinkGenerator linkGenerator)
     {
         this.motoService = motoService;
+        this.linkGenerator = linkGenerator;
     }
 
-   [HttpGet]
-[SwaggerOperation(
-    Summary = "Lista todas as motos",
-    Description = "Retorna uma lista paginada de todas as motos cadastradas. Caso não haja motos, retorna 204 No Content.",
-    OperationId = "GetAllMotos",
-    Tags = new[] { "Moto" }
-)]
-[ProducesResponseType(StatusCodes.Status200OK)]
-[ProducesResponseType(StatusCodes.Status204NoContent)]
-public IActionResult Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+
+   private object GetMotoResource(MotoModel moto)
 {
-    if (page <= 0) page = 1;
-    if (pageSize <= 0) pageSize = 10;
-
-    var allMotos = motoService.ListarTodas();
-    if (!allMotos.Any()) return NoContent();
-
-    var totalItems = allMotos.Count;
-    var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-    var motosPage = allMotos
-        .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .Select(m => new
-        {
-            m.id,
-            m.tipoMoto,
-            m.placa,
-            m.numChassi,
-            links = new
-            {
-                self = Url.Action(nameof(Get), new { id = m.id }),
-                update = Url.Action(nameof(Put), new { id = m.id }),
-                delete = Url.Action(nameof(Delete), new { id = m.id }),
-                all = Url.Action(nameof(Get))
-            }
-        })
-        .Cast<object>() // força para object, compatível com PagedResultDto<object>
-        .ToList();
-
-    var result = new PagedResultDto<object>
+    return new
     {
-        Page = page,
-        PageSize = pageSize,
-        TotalPages = totalPages,
-        TotalItems = totalItems,
-        Links = new
+        moto.id,
+        moto.tipoMoto,
+        moto.placa,
+        moto.numChassi,
+        tagRfid = moto.TagRfid != null
+            ? new
+            {
+                moto.TagRfid.Id,
+                moto.TagRfid.FaixaFrequencia,
+                moto.TagRfid.Banda,
+                moto.TagRfid.Aplicacao
+            }
+            : null,
+        links = new
         {
-            self = Url.Action(nameof(Get), new { page, pageSize }),
-            next = page < totalPages ? Url.Action(nameof(Get), new { page = page + 1, pageSize }) : null,
-            prev = page > 1 ? Url.Action(nameof(Get), new { page = page - 1, pageSize }) : null
-        },
-        Items = motosPage
+            self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
+            update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
+            delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
+            all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
+        }
     };
+}
 
-    return Ok(result);
+
+
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [SwaggerOperation(Summary = "Obtém todas as motos", Description = "Retorna uma lista de todas as motos cadastradas com paginação.")]
+    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MotoListResponseExample))]
+    public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    {
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+
+        // Aqui pegamos um IQueryable para aplicar paginação direto no banco
+        var query = motoService.ListarTodas(); // Retorna IQueryable<MotoModel>
+
+        var totalItems = await query.CountAsync();
+        if (totalItems == 0)
+            return NoContent();
+
+        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        // Paginação direta no banco
+        var motosPage = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        // Gera os links HATEOAS usando GetMotoResource
+        var motosComLinks = motosPage.Select(m => GetMotoResource(m)).ToList();
+
+        var result = new PagedResultDto<object>
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = totalPages,
+            TotalItems = totalItems,
+            Links = new
+            {
+                self = Url.Action(nameof(Get), new { page, pageSize }),
+                next = page < totalPages ? Url.Action(nameof(Get), new { page = page + 1, pageSize }) : null,
+                prev = page > 1 ? Url.Action(nameof(Get), new { page = page - 1, pageSize }) : null
+            },
+            Items = motosComLinks
+        };
+
+        return Ok(result);
+    
 }
 
     [HttpGet("{id}")]
@@ -82,17 +107,21 @@ public IActionResult Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10
     )]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MotoGetByIdResponseExample))]
     public IActionResult Get(int id)
     {
         var moto = motoService.ObterPorId(id);
         if (moto == null) return NotFound();
 
-        var resultado = new {
+        var resultado = new
+        {
             moto.id,
             moto.tipoMoto,
+            moto.TagRfid,
             moto.placa,
             moto.numChassi,
-            links = new {
+            links = new
+            {
                 all = Url.Action(nameof(Get)),
                 self = Url.Action(nameof(Get), new { id = moto.id }),
                 update = Url.Action(nameof(Put), new { id = moto.id }),
@@ -141,6 +170,7 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
     )]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))] // <<< aqui!
     public IActionResult Post([FromBody] MotoModel moto)
     {
         if (string.IsNullOrWhiteSpace(moto.tipoMoto) || string.IsNullOrWhiteSpace(moto.placa))
@@ -174,6 +204,7 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))]
     public IActionResult Put(int id, [FromBody] MotoModel moto)
     {
         if (moto == null || moto.id != id)

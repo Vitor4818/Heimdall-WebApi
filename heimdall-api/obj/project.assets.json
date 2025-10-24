@@ -579,7 +579,7 @@
       "Microsoft.Extensions.DependencyModel/9.0.4": {
         "type": "package",
         "compile": {
-          "lib/net9.0/_._": {
+          "lib/net9.0/Microsoft.Extensions.DependencyModel.dll": {
             "related": ".xml"
           }
         },
@@ -771,6 +771,23 @@
           "Microsoft.AspNetCore.App"
         ]
       },
+      "Scrutor/3.3.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.9",
+          "Microsoft.Extensions.DependencyModel": "3.1.6"
+        },
+        "compile": {
+          "lib/netcoreapp3.1/Scrutor.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/Scrutor.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Swashbuckle.AspNetCore/8.1.1": {
         "type": "package",
         "dependencies": {
@@ -800,6 +817,29 @@
           "lib/net9.0/Swashbuckle.AspNetCore.Annotations.dll": {
             "related": ".pdb;.xml"
           }
+        }
+      },
+      "Swashbuckle.AspNetCore.Filters/9.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Scrutor": "3.3.0",
+          "Swashbuckle.AspNetCore.Filters.Abstractions": "9.0.1",
+          "Swashbuckle.AspNetCore.SwaggerGen": "8.0.0"
+        },
+        "compile": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Filters.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Filters.dll": {}
+        }
+      },
+      "Swashbuckle.AspNetCore.Filters.Abstractions/9.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll": {}
         }
       },
       "Swashbuckle.AspNetCore.Swagger/8.1.1": {
@@ -3067,6 +3107,26 @@
         "redoc.aspnetcore.nuspec"
       ]
     },
+    "Scrutor/3.3.0": {
+      "sha512": "BwqCnFzp2/Z+pq17iztxlIkR/ZANyPRR4PdE57WL1w/JW4AM/2imoxBWTL3+G+YXA46ce4s9OUgwWqTXYrtI8A==",
+      "type": "package",
+      "path": "scrutor/3.3.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net461/Scrutor.dll",
+        "lib/net461/Scrutor.pdb",
+        "lib/net461/Scrutor.xml",
+        "lib/netcoreapp3.1/Scrutor.dll",
+        "lib/netcoreapp3.1/Scrutor.pdb",
+        "lib/netcoreapp3.1/Scrutor.xml",
+        "lib/netstandard2.0/Scrutor.dll",
+        "lib/netstandard2.0/Scrutor.pdb",
+        "lib/netstandard2.0/Scrutor.xml",
+        "scrutor.3.3.0.nupkg.sha512",
+        "scrutor.nuspec"
+      ]
+    },
     "Swashbuckle.AspNetCore/8.1.1": {
       "sha512": "HJHexmU0PiYevgTLvKjYkxEtclF2w4O7iTd3Ef3p6KeT0kcYLpkFVgCw6glpGS57h8769anv8G+NFi9Kge+/yw==",
       "type": "package",
@@ -3100,6 +3160,34 @@
         "package-readme.md",
         "swashbuckle.aspnetcore.annotations.8.1.1.nupkg.sha512",
         "swashbuckle.aspnetcore.annotations.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore.Filters/9.0.1": {
+      "sha512": "Lg4oCXWDY7r34hxSz1EeOu25EDEpBqcwP5oIqtk3BKQ/id7Ur7U0jfpPZA2SJJsUFhaLWWAHuvI3I7IiZLc3Hg==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.filters/9.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net8.0/Swashbuckle.AspNetCore.Filters.dll",
+        "lib/netstandard2.0/Swashbuckle.AspNetCore.Filters.dll",
+        "swashbuckle.aspnetcore.filters.9.0.1.nupkg.sha512",
+        "swashbuckle.aspnetcore.filters.nuspec"
+      ]
+    },
+    "Swashbuckle.AspNetCore.Filters.Abstractions/9.0.1": {
+      "sha512": "t1fdkAb4PFK+6N1QhxwU2MVhgI7yua9yn7GK5nLxFlmHShXfoZg07qS4RiYua5ZmEJpzUOoHjNCDjHPATv4T1w==",
+      "type": "package",
+      "path": "swashbuckle.aspnetcore.filters.abstractions/9.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net8.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll",
+        "lib/netstandard2.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll",
+        "swashbuckle.aspnetcore.filters.abstractions.9.0.1.nupkg.sha512",
+        "swashbuckle.aspnetcore.filters.abstractions.nuspec"
       ]
     },
     "Swashbuckle.AspNetCore.Swagger/8.1.1": {
@@ -3851,7 +3939,8 @@
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4",
       "Redoc.AspNetCore >= 1.0.0",
       "Swashbuckle.AspNetCore >= 8.1.1",
-      "Swashbuckle.AspNetCore.Annotations >= 8.1.1"
+      "Swashbuckle.AspNetCore.Annotations >= 8.1.1",
+      "Swashbuckle.AspNetCore.Filters >= 9.0.1"
     ]
   },
   "packageFolders": {
@@ -3932,6 +4021,10 @@
           "Swashbuckle.AspNetCore.Annotations": {
             "target": "Package",
             "version": "[8.1.1, )"
+          },
+          "Swashbuckle.AspNetCore.Filters": {
+            "target": "Package",
+            "version": "[9.0.1, )"
           }
         },
         "imports": [
