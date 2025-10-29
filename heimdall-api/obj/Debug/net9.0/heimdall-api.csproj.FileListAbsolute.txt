@@ -157,6 +157,7 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\hei
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\heimdall-api.runtimeconfig.json
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\heimdall-api.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\heimdall-api.pdb
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\heimdall-api.xml
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Humanizer.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Microsoft.Bcl.AsyncInterfaces.dll
@@ -188,7 +189,10 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Npg
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Oracle.EntityFrameworkCore.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Oracle.ManagedDataAccess.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Redoc.AspNetCore.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Scrutor.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Annotations.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -297,11 +301,7 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\sta
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall.EB162DF3.Up2Date
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\refint\heimdall-api.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.xml
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.pdb
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.genruntimeconfig.cache
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\ref\heimdall-api.dll
-C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\heimdall-api.xml
-C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\obj\Debug\net9.0\heimdall-api.xml
-C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Scrutor.dll
-C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.dll
-C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\heimdall-api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Filters.Abstractions.dll

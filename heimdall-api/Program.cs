@@ -41,8 +41,9 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 // Injeção de dependências
 builder.Services.AddScoped<TagRfidService>();
 builder.Services.AddScoped<UsuarioService>();
-builder.Services.AddScoped<MotoService>(); 
+builder.Services.AddScoped<MotoService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ZonaService>();
 
 
 builder.Services.AddControllers().AddJsonOptions(x =>
