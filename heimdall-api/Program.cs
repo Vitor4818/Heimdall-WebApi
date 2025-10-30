@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 using Redoc.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuração do DbContext com PostgreSQL
@@ -104,3 +106,9 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.Urls.Add("http://0.0.0.0:5000");
 app.Run();
+
+
+namespace HeimdallApi
+{
+    public partial class Program { } // necessário para testes de integração
+}

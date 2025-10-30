@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeimdallModel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae9ff8385bbb7ad454e97dd76bd2d4dfa6c528d9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d2f367718210453640d90a92c2b489d3bcc089c")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeimdallModel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeimdallModel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
