@@ -58,6 +58,9 @@ namespace HeimdallData.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
 
+                    b.Property<int?>("VagaId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("numChassi")
                         .IsRequired()
                         .HasColumnType("text");
@@ -71,6 +74,9 @@ namespace HeimdallData.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("id");
+
+                    b.HasIndex("VagaId")
+                        .IsUnique();
 
                     b.ToTable("Moto");
                 });
@@ -148,6 +154,61 @@ namespace HeimdallData.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("HeimdallModel.VagaModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Codigo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("Ocupada")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ZonaId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZonaId");
+
+                    b.ToTable("Vaga");
+                });
+
+            modelBuilder.Entity("HeimdallModel.ZonaModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Zona");
+                });
+
+            modelBuilder.Entity("HeimdallModel.MotoModel", b =>
+                {
+                    b.HasOne("HeimdallModel.VagaModel", "Vaga")
+                        .WithOne("Moto")
+                        .HasForeignKey("HeimdallModel.MotoModel", "VagaId");
+
+                    b.Navigation("Vaga");
+                });
+
             modelBuilder.Entity("HeimdallModel.TagRfidModel", b =>
                 {
                     b.HasOne("HeimdallModel.MotoModel", "Moto")
@@ -170,6 +231,17 @@ namespace HeimdallData.Migrations
                     b.Navigation("CategoriaUsuario");
                 });
 
+            modelBuilder.Entity("HeimdallModel.VagaModel", b =>
+                {
+                    b.HasOne("HeimdallModel.ZonaModel", "Zona")
+                        .WithMany("Vagas")
+                        .HasForeignKey("ZonaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zona");
+                });
+
             modelBuilder.Entity("HeimdallModel.CategoriaUsuarioModel", b =>
                 {
                     b.Navigation("Usuarios");
@@ -178,6 +250,16 @@ namespace HeimdallData.Migrations
             modelBuilder.Entity("HeimdallModel.MotoModel", b =>
                 {
                     b.Navigation("TagRfid");
+                });
+
+            modelBuilder.Entity("HeimdallModel.VagaModel", b =>
+                {
+                    b.Navigation("Moto");
+                });
+
+            modelBuilder.Entity("HeimdallModel.ZonaModel", b =>
+                {
+                    b.Navigation("Vagas");
                 });
 #pragma warning restore 612, 618
         }
