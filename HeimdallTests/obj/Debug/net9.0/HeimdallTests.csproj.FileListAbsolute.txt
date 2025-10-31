@@ -324,6 +324,7 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Mi
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.Relational.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.Extensions.Caching.Abstractions.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.Extensions.Caching.Memory.dll
@@ -477,4 +478,3 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\obj\Debug\net9.0\re
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\obj\Debug\net9.0\HeimdallTests.pdb
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\obj\Debug\net9.0\HeimdallTests.genruntimeconfig.cache
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\obj\Debug\net9.0\ref\HeimdallTests.dll
-C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll
