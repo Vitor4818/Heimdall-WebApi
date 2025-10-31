@@ -1,104 +1,103 @@
 using Xunit;
 using HeimdallModel;
 using HeimdallData;
-using HeimdallApi; 
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
-using System.Linq;
-using System.Net;
 
 namespace HeimdallTests
 {
-    public class ZonaControllerIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+    public class ZonaControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     {
-        private readonly WebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
+        private readonly CustomWebApplicationFactory _factory;
 
-        public ZonaControllerIntegrationTests(WebApplicationFactory<Program> factory)
+        public ZonaControllerIntegrationTests(CustomWebApplicationFactory factory)
         {
-            // Configura a fábrica para usar banco em memória
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.ConfigureServices(services =>
-                {
-                    var descriptor = services.SingleOrDefault(
-                        d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
+            _factory = factory;
+            _client = factory.CreateClient();
 
-                    if (descriptor != null)
-                        services.Remove(descriptor);
-
-                    services.AddDbContext<AppDbContext>(options =>
-                    {
-                        options.UseInMemoryDatabase("HeimdallTestDb");
-                    });
-                });
-            });
-
-            _client = _factory.CreateClient();
+            // Reseta o banco antes de cada teste
+            _factory.ResetDatabase(_factory.Services);
         }
 
         [Fact]
         public async Task Get_Zonas_RetornaListaVazia()
         {
+ 
+            //Act
             var response = await _client.GetAsync("/api/zona");
-            response.EnsureSuccessStatusCode();
-
-            var zonas = await response.Content.ReadFromJsonAsync<ZonaModel[]>();
-            Assert.NotNull(zonas);
-            Assert.Empty(zonas);
+            
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Fact]
         public async Task Post_Zona_CadastraNovaZona()
         {
-            var novaZona = new ZonaModel {Id = 1, Nome = "Zona Teste", Tipo = "Residencial" };
+            //Arrange
+            var zona = new ZonaModel { Id = 10, Nome = "Zona Teste", Tipo = "Residencial" };
 
-            var response = await _client.PostAsJsonAsync("/api/zona", novaZona);
+            //Act
+            var response = await _client.PostAsJsonAsync("/api/zona", zona);
+
+            //Assert
             response.EnsureSuccessStatusCode();
+            
+            var json = await response.Content.ReadAsStringAsync();
+            var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
 
-            var zonaCriada = await response.Content.ReadFromJsonAsync<ZonaModel>();
-            Assert.NotNull(zonaCriada);
-            Assert.Equal("Zona Teste", zonaCriada!.Nome);
+            Assert.Equal("Zona Teste", root.GetProperty("nome").GetString());
+            Assert.Equal("Residencial", root.GetProperty("tipo").GetString());
         }
 
         [Fact]
         public async Task Put_Zona_AtualizaZonaExistente()
         {
-            var zona = new ZonaModel {Id = 1, Nome = "Zona Inicial", Tipo = "Comercial" };
-            var postResponse = await _client.PostAsJsonAsync("/api/zona", zona);
-            postResponse.EnsureSuccessStatusCode();
-            var zonaCriada = await postResponse.Content.ReadFromJsonAsync<ZonaModel>();
+            // Arrange
+            var zonaInicial = new ZonaModel { Id = 2, Nome = "Zona Inicial", Tipo = "Comercial" };
+            await _client.PostAsJsonAsync("/api/zona", zonaInicial);
+            var zonaAtualizada = new ZonaModel { Id = zonaInicial.Id, Nome = "Zona Atualizada", Tipo = "Residencial" };
 
-            var zonaAtualizada = new ZonaModel { Id = zonaCriada!.Id, Nome = "Zona Atualizada", Tipo = "Residencial" };
-            var putResponse = await _client.PutAsJsonAsync($"/api/zona/{zonaAtualizada.Id}", zonaAtualizada);
+            //Act
+            var putResponse = await _client.PutAsJsonAsync($"/api/zona/{zonaInicial.Id}", zonaAtualizada);
+
+            // Assert
             Assert.Equal(HttpStatusCode.NoContent, putResponse.StatusCode);
 
             var getResponse = await _client.GetAsync("/api/zona");
             getResponse.EnsureSuccessStatusCode();
-            var zonas = await getResponse.Content.ReadFromJsonAsync<ZonaModel[]>();
-            Assert.Single(zonas);
-            Assert.Equal("Zona Atualizada", zonas![0].Nome);
+            var content = await getResponse.Content.ReadAsStringAsync();
+            var paged = JsonSerializer.Deserialize<PagedResultDto<JsonElement>>(content, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            Assert.NotNull(paged);
+            Assert.Single(paged!.Items); 
+            Assert.Equal("Zona Atualizada", paged.Items[0].GetProperty("nome").GetString());
         }
 
         [Fact]
         public async Task Delete_Zona_RemoveZonaExistente()
         {
-            var zona = new ZonaModel {Id = 1, Nome = "Zona Para Remover", Tipo = "Comercial" };
-            var postResponse = await _client.PostAsJsonAsync("/api/zona", zona);
-            postResponse.EnsureSuccessStatusCode();
-            var zonaCriada = await postResponse.Content.ReadFromJsonAsync<ZonaModel>();
+            // Arrange
+            var zona = new ZonaModel { Id = 3, Nome = "Zona Para Remover", Tipo = "Comercial" };
+            await _client.PostAsJsonAsync("/api/zona", zona);
 
-            var deleteResponse = await _client.DeleteAsync($"/api/zona/{zonaCriada!.Id}");
+            // Act
+            var deleteResponse = await _client.DeleteAsync($"/api/zona/{zona.Id}");
+
+            // Assert
+            //Verificar se o DELETE retornou NoContent
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
             var getResponse = await _client.GetAsync("/api/zona");
-            getResponse.EnsureSuccessStatusCode();
-            var zonas = await getResponse.Content.ReadFromJsonAsync<ZonaModel[]>();
-            Assert.Empty(zonas);
+            Assert.Equal(HttpStatusCode.NoContent, getResponse.StatusCode);
         }
     }
 }
+
