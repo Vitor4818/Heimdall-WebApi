@@ -29,5 +29,14 @@ namespace HeimdallModel
         /// Tag RFID associada à moto, usada para identificação.
         /// </summary>
         public TagRfidModel? TagRfid { get; set; }
+         /// <summary>
+        /// Identificador da vaga onde a moto está estacionada (se houver).
+        /// </summary>
+        public int? VagaId { get; set; }
+
+        /// <summary>
+        /// Vaga onde a moto está estacionada.
+        /// </summary>
+        public VagaModel? Vaga { get; set; }
     }
 }

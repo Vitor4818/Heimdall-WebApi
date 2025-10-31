@@ -170,7 +170,7 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
     )]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))] // <<< aqui!
+    [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))] 
     public IActionResult Post([FromBody] MotoModel moto)
     {
         if (string.IsNullOrWhiteSpace(moto.tipoMoto) || string.IsNullOrWhiteSpace(moto.placa))

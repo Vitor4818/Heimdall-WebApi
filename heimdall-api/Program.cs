@@ -7,9 +7,14 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuração do DbContext com PostgreSQL
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+// ✅ Usa PostgreSQL normalmente, exceto nos testes
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
+// NOTA: Se o ambiente for "Testing", o AppDbContext será injetado
+// pela CustomWebApplicationFactory em memória.
 
 // Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
@@ -41,8 +46,9 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 // Injeção de dependências
 builder.Services.AddScoped<TagRfidService>();
 builder.Services.AddScoped<UsuarioService>();
-builder.Services.AddScoped<MotoService>(); 
+builder.Services.AddScoped<MotoService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<ZonaService>();
 
 
 builder.Services.AddControllers().AddJsonOptions(x =>
@@ -50,36 +56,44 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 var app = builder.Build();
 
-// Aplica migrations automaticamente e verifica a conexão
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    try
-    {
-        // Aplica migrations pendentes
-        dbContext.Database.Migrate();
 
-        if (dbContext.Database.CanConnect())
+// --- MUDANÇA PRINCIPAL AQUI ---
+// Migrations e Seeding SÓ DEVEM OCORRER no ambiente real (não-Testing)
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    // 1. Bloco de Migração e Verificação de Conexão
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        try
         {
-            Console.WriteLine("Conexão com o banco de dados bem-sucedida e migrations aplicadas!");
+            // Aplica migrations pendentes
+            dbContext.Database.Migrate();
+
+            if (dbContext.Database.CanConnect())
+            {
+                Console.WriteLine("Conexão com o banco de dados bem-sucedida e migrations aplicadas!");
+            }
+            else
+            {
+                Console.WriteLine("Não foi possível conectar ao banco de dados.");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("Não foi possível conectar ao banco de dados.");
+            Console.WriteLine($"Erro ao conectar ou migrar o banco de dados: {ex.Message}");
         }
     }
-    catch (Exception ex)
+
+    // 2. Bloco do Seeder
+    using (var scope = app.Services.CreateScope())
     {
-        Console.WriteLine($"Erro ao conectar ou migrar o banco de dados: {ex.Message}");
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        DbSeeder.SeedMotos(context);
     }
 }
+// --- FIM DA MUDANÇA ---
 
-// Seed inicial (após aplicar migrations)
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    DbSeeder.SeedMotos(context);
-}
 
 // Configuração do Swagger/ReDoc para Development
 if (app.Environment.IsDevelopment())
@@ -103,3 +117,9 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.Urls.Add("http://0.0.0.0:5000");
 app.Run();
+
+
+namespace HeimdallApi
+{
+    public partial class Program { } // necessário para testes de integração
+}
