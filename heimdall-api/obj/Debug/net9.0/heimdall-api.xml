@@ -4,5 +4,10 @@
         <name>heimdall-api</name>
     </assembly>
     <members>
+        <member name="M:MotosApi.Controllers.MotosController.GetMotoResource(HeimdallModel.MotoModel)">
+            <summary>
+            Método helper privado para formatar a resposta da Moto com links HATEOAS.
+            </summary>
+        </member>
     </members>
 </doc>

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HeimdallModel")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79ecd83d62042030b91df513ec5214ce20fcd0b3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b62e00785a10d0d522258c69e51e9eef134c603")]
 [assembly: System.Reflection.AssemblyProductAttribute("HeimdallModel")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HeimdallModel")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
