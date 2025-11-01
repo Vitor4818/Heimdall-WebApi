@@ -6,6 +6,8 @@ namespace MotosApi.Controllers;
 using Microsoft.EntityFrameworkCore;
 using MotosApi.SwaggerExamples; 
 using Swashbuckle.AspNetCore.Filters;
+using System.Threading.Tasks; 
+using System.Linq; 
 
 [ApiController]
 [Route("api/[controller]")]
@@ -23,18 +25,15 @@ public class MotosController : ControllerBase
 
     private object GetMotoResource(MotoModel moto)
     {
-                return new
-                {
-                    
-                    moto.id,
-                    moto.tipoMoto,
-                    moto.placa,
-                    moto.numChassi,
-                    moto.VagaId, 
-
-                    
-                    vaga = moto.Vaga != null
-                ? new 
+        return new
+        {
+            moto.id,
+            moto.tipoMoto,
+            moto.placa,
+            moto.numChassi,
+            moto.VagaId,
+            vaga = moto.Vaga != null
+                ? new
                 {
                     moto.Vaga.Id,
                     moto.Vaga.Codigo,
@@ -46,8 +45,7 @@ public class MotosController : ControllerBase
                     }
                 }
                 : null,
-
-                    tagRfid = moto.TagRfid != null
+            tagRfid = moto.TagRfid != null
                 ? new
                 {
                     moto.TagRfid.Id,
@@ -57,15 +55,14 @@ public class MotosController : ControllerBase
                     moto.TagRfid.Aplicacao
                 }
                 : null,
-
-                    links = new
-                    {
-                        self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
-                        update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
-                        delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
-                        all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
-                    }
-                };
+            links = new
+            {
+                self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
+                update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
+                delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
+                all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
+            }
+        };
     }
 
 
@@ -78,7 +75,6 @@ public class MotosController : ControllerBase
     {
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
-
 
         var query = motoService.ListarTodas();
 
@@ -111,16 +107,10 @@ public class MotosController : ControllerBase
         };
 
         return Ok(result);
-
     }
 
     [HttpGet("{id}")]
-    [SwaggerOperation(
-        Summary = "Obtém uma moto por ID",
-        Description = "Retorna uma moto com base no ID fornecido. Se não encontrar a moto, retorna 404 Not Found.",
-        OperationId = "GetMotoById",
-        Tags = new[] { "Moto" }
-    )]
+    [SwaggerOperation(Summary = "Obtém uma moto por ID")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [SwaggerResponseExample(StatusCodes.Status200OK, typeof(MotoGetByIdResponseExample))]
@@ -130,37 +120,25 @@ public class MotosController : ControllerBase
         if (moto == null) return NotFound();
 
         var resultado = GetMotoResource(moto);
-
         return Ok(resultado);
     }
 
     [HttpGet("tipo")]
-    [SwaggerOperation(
-        Summary = "Obtém motos por tipo",
-        Description = "Retorna uma lista de motos filtradas por tipo. Se não encontrar motos desse tipo, retorna 404 Not Found.",
-        OperationId = "GetMotosByType",
-        Tags = new[] { "Moto" }
-    )]
+    [SwaggerOperation(Summary = "Obtém motos por tipo")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetPorTipo([FromQuery] string tipo)
     {
-
-        var moto = motoService.ObterPorTipo(tipo); 
+        // NOTA: arrumar o service ObterPorTipo pois está retornando APENAS UMA moto.
+        var moto = motoService.ObterPorTipo(tipo);
         if (moto == null) return NotFound();
 
         var resultado = GetMotoResource(moto);
-
         return Ok(resultado);
     }
 
     [HttpPost]
-    [SwaggerOperation(
-        Summary = "Cadastra uma nova moto",
-        Description = "Recebe um objeto de moto e cadastra uma nova moto. Retorna o objeto da moto criada com status 201 Created.",
-        OperationId = "CreateMoto",
-        Tags = new[] { "Moto" }
-    )]
+    [SwaggerOperation(Summary = "Cadastra uma nova moto")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))]
@@ -171,18 +149,17 @@ public class MotosController : ControllerBase
 
         var criada = motoService.CadastrarMoto(moto);
 
-        var resultado = GetMotoResource(criada);
+        if (criada == null)
+        {
+            return BadRequest("A VagaId fornecida é inválida ou já está ocupada.");
+        }
 
+        var resultado = GetMotoResource(criada);
         return CreatedAtAction(nameof(Get), new { id = criada.id }, resultado);
     }
 
     [HttpPut("{id}")]
-    [SwaggerOperation(
-        Summary = "Atualiza uma moto existente",
-        Description = "Atualiza os dados de uma moto existente. Retorna 204 No Content se a atualização for bem-sucedida. Caso contrário, retorna 404 Not Found.",
-        OperationId = "UpdateMoto",
-        Tags = new[] { "Moto" }
-    )]
+    [SwaggerOperation(Summary = "Atualiza uma moto existente")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -191,17 +168,26 @@ public class MotosController : ControllerBase
     {
         if (moto == null || moto.id != id)
             return BadRequest("Dados inconsistentes.");
+    
+        var motoExistente = motoService.ObterPorId(id);
+        if (motoExistente == null)
+        {
+            return NotFound(); 
+        }
 
-        return motoService.Atualizar(moto) ? NoContent() : NotFound();
+       
+        var sucesso = motoService.Atualizar(moto);
+
+        if (!sucesso)
+        {
+            return BadRequest("A vaga de destino é inválida ou já está ocupada.");
+        }
+
+        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(
-        Summary = "Remove uma moto",
-        Description = "Remove uma moto com base no ID fornecido. Retorna 204 No Content se a remoção for bem-sucedida. Caso contrário, retorna 404 Not Found.",
-        OperationId = "DeleteMoto",
-        Tags = new[] { "Moto" }
-    )]
+    [SwaggerOperation(Summary = "Remove uma moto")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult Delete(int id)
