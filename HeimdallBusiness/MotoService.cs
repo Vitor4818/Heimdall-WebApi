@@ -97,7 +97,6 @@ namespace HeimdallBusiness
                 if (vagaAntiga != null)
                 {
                     vagaAntiga.Ocupada = false;
-                    _context.Vaga.Update(vagaAntiga);
                 }
             }
 
@@ -123,7 +122,6 @@ namespace HeimdallBusiness
 
                 //CASO 4: Se a vaga nova existe e está livre, ocupa ela.
                 vagaNova.Ocupada = true;
-                _context.Vaga.Update(vagaNova);
             }
 
             //Salva as alterações
@@ -132,25 +130,33 @@ namespace HeimdallBusiness
         }
         
 
-        public bool Remover(int id)
+         public bool Remover(int id)
         {
-
             var motoParaRemover = _context.Moto.Find(id); 
             if (motoParaRemover == null) return false;
 
+            //Antes de apagar a moto, verifica se existe uma Tag vinculada a ela.
+            var tagVinculada = _context.TagsRfid.FirstOrDefault(t => t.MotoId == id);
+            if (tagVinculada != null)
+            {
+                //Desvincula a tag (define MotoId = 0, que é "nulo")
+                tagVinculada.MotoId = 0;
+            }
+
+
+            // Lógica da Vaga (que já estava correta, mas removi o .Update)
             if (motoParaRemover.VagaId != null)
             {
                 var vagaOcupada = _context.Vaga.Find(motoParaRemover.VagaId);
                 if (vagaOcupada != null)
                 {
-
                     vagaOcupada.Ocupada = false;
-                    _context.Vaga.Update(vagaOcupada);
                 }
             }
 
             _context.Moto.Remove(motoParaRemover); 
             
+            // Salva TODAS as alterações (Moto apagada, Tag atualizada, Vaga atualizada)
             _context.SaveChanges(); 
             return true; 
         }
