@@ -5,6 +5,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
 using HeimdallApi.SwaggerExamples.TagRfid;
 using Swashbuckle.AspNetCore.Filters;
+using System.Threading.Tasks; 
+using System.Linq; 
 
 namespace HeimdallApi.Controllers
 {
@@ -47,42 +49,41 @@ namespace HeimdallApi.Controllers
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(TagRfidListResponseExample))]
 
     public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-{
-    if (page <= 0) page = 1;
-    if (pageSize <= 0) pageSize = 10;
-
-    var query = tagService.ListarTags();
-
-    var totalItems = await query.CountAsync();
-    if (totalItems == 0)
-        return NoContent();
-
-    var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-    var tagsPage = await query
-        .Skip((page - 1) * pageSize)
-        .Take(pageSize)
-        .ToListAsync();
-
-    var tagLinks = tagsPage.Select(t => GetTagRfidResource(t)).ToList();
-
-    var result = new PagedResultDto<object>
     {
-        Page = page,
-        PageSize = pageSize,
-        TotalPages = totalPages,
-        TotalItems = totalItems,
-        Links = new
-        {
-            self = Url.Action(nameof(Get), new { page, pageSize }),
-            next = page < totalPages ? Url.Action(nameof(Get), new { page = page + 1, pageSize }) : null,
-            prev = page > 1 ? Url.Action(nameof(Get), new { page = page - 1, pageSize }) : null
-        },
-        Items = tagLinks
-    };
+        if (page <= 0) page = 1;
+        if (pageSize <= 0) pageSize = 10;
+        var query = tagService.ListarTags();
 
-    return Ok(result);
-}
+        var totalItems = await query.CountAsync();
+        if (totalItems == 0)
+            return NoContent();
+
+        var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+        var tagsPage = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        var tagLinks = tagsPage.Select(t => GetTagRfidResource(t)).ToList();
+
+        var result = new PagedResultDto<object>
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = totalPages,
+            TotalItems = totalItems,
+            Links = new
+            {
+                self = Url.Action(nameof(Get), new { page, pageSize }),
+                next = page < totalPages ? Url.Action(nameof(Get), new { page = page + 1, pageSize }) : null,
+                prev = page > 1 ? Url.Action(nameof(Get), new { page = page - 1, pageSize }) : null
+            },
+            Items = tagLinks
+        };
+
+        return Ok(result);
+    }
 
 
         [HttpGet("{id}")]
@@ -104,12 +105,13 @@ namespace HeimdallApi.Controllers
         [SwaggerRequestExample(typeof(TagRfidModel), typeof(TagRfidPostExample))]
         public IActionResult Post([FromBody] TagRfidModel tag)
         {
+
             if (string.IsNullOrWhiteSpace(tag.FaixaFrequencia) ||
                 string.IsNullOrWhiteSpace(tag.Banda) ||
                 string.IsNullOrWhiteSpace(tag.Aplicacao) ||
-                tag.MotoId == 0)
+                tag.MotoId < 0)
             {
-                return BadRequest("Todos os campos da tag são obrigatórios.");
+                return BadRequest("Todos os campos da tag são obrigatórios e MotoId não pode ser negativo.");
             }
 
             var criada = tagService.CadastrarTag(tag);
@@ -123,7 +125,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(Summary = "Atualiza uma tag RFID existente", Description = "Atualiza os dados de uma tag RFID já cadastrada.")]
-        [SwaggerRequestExample(typeof(TagRfidModel), typeof(TagRfidPostExample))] // usa o mesmo exemplo do POST
+        [SwaggerRequestExample(typeof(TagRfidModel), typeof(TagRfidPostExample))] 
 
         public IActionResult Put(int id, [FromBody] TagRfidModel tag)
         {
@@ -135,11 +137,26 @@ namespace HeimdallApi.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [SwaggerOperation(Summary = "Remove uma tag RFID", Description = "Remove uma tag RFID do sistema com base no ID.")]
+        [SwaggerOperation(Summary = "Remove uma tag RFID", Description = "Remove uma tag RFID do sistema, se ela não estiver vinculada a uma moto.")]
         public IActionResult Delete(int id)
         {
-            return tagService.RemoverTag(id) ? NoContent() : NotFound();
+            var tag = tagService.ObterPorId(id);
+            if (tag == null)
+            {
+                return NotFound(); 
+            }
+
+
+            var sucesso = tagService.RemoverTag(id);
+
+            if (!sucesso)
+            {
+                return BadRequest("Não é possível remover uma tag RFID que está vinculada a uma moto.");
+            }
+
+            return NoContent(); 
         }
     }
 }
