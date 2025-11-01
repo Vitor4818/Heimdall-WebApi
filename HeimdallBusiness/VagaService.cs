@@ -30,7 +30,6 @@ namespace HeimdallBusiness
             return _context.Vaga
                 .Include(v => v.Moto)
                 .Include(v => v.Zona)
-                .AsNoTracking()
                 .FirstOrDefault(v => v.Id == id);
         }
         //Cadastrar Vaga
@@ -67,6 +66,21 @@ namespace HeimdallBusiness
             }
 
             _context.Vaga.Remove(vaga);
+            _context.SaveChanges();
+            return true;
+        }
+
+        //libera vaga
+         public bool LiberarVaga(VagaModel vaga)
+        {
+
+            if (vaga.Moto != null)
+            {
+                vaga.Moto.VagaId = null; 
+            }
+
+            vaga.Ocupada = false;
+
             _context.SaveChanges();
             return true;
         }

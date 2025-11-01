@@ -217,6 +217,48 @@ namespace HeimdallTests
         }
 
         #endregion
+
+        
+          #region Testes de LiberarVaga (NOVO)
+
+        [Fact]
+        public void LiberarVaga_DeveLiberarVaga_QuandoOcupada()
+        {
+            // Organizar
+            var contexto = CriarContextoEmMemoria();
+            var service = new VagaService(contexto);
+
+            var zona = new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" };
+            contexto.Zona.Add(zona);
+            contexto.SaveChanges();
+
+            var moto = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC1234", numChassi = "123", VagaId = 1 };
+            var vaga = new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true, Moto = moto };
+            
+            contexto.Moto.Add(moto);
+            contexto.Vaga.Add(vaga);
+            contexto.SaveChanges();
+            
+            contexto.ChangeTracker.Clear();
+
+            var vagaParaLiberar = service.ObterPorId(1);
+            Assert.NotNull(vagaParaLiberar); 
+            Assert.NotNull(vagaParaLiberar.Moto); 
+
+            // Agir
+            var resultado = service.LiberarVaga(vagaParaLiberar);
+
+            // Verificar
+            Assert.True(resultado);
+            
+            // Verifica os objetos em memória (que acabaram de ser salvos)
+            Assert.False(vagaParaLiberar.Ocupada); 
+
+          
+            Assert.Null(vagaParaLiberar.Moto); 
+        }
+
+        #endregion
     }
 }
 
