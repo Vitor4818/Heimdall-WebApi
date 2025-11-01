@@ -141,7 +141,7 @@ namespace HeimdallApi.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(Summary = "Remove uma vaga", Description = "Remove uma vaga do sistema, se ela não estiver ocupada.")]
         public IActionResult Delete(int id)
@@ -149,15 +149,45 @@ namespace HeimdallApi.Controllers
             var vaga = vagaService.ObterPorId(id);
             if (vaga == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
             var sucesso = vagaService.RemoverVaga(id);
             if (!sucesso)
             {
                 return BadRequest("Não é possível remover uma vaga que está ocupada.");
             }
-            return NoContent(); 
+            return NoContent();
 
+        }
+
+        //Criando endpoint de liberar vaga, conforme a regra de negócios
+        [HttpPatch("{id}/liberar")] 
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [SwaggerOperation(Summary = "Libera uma vaga ocupada", 
+            Description = "Define uma vaga ocupada como 'Disponível' e remove a associação da moto (define Moto.VagaId = null).")]
+        public IActionResult LiberarVaga(int id)
+        {
+            var vaga = vagaService.ObterPorId(id);
+            if (vaga == null)
+            {
+                return NotFound("Vaga não encontrada.");
+            }
+
+            if (!vaga.Ocupada || vaga.Moto == null)
+            {
+                return BadRequest("A vaga selecionada já está livre.");
+            }
+
+            var sucesso = vagaService.LiberarVaga(vaga);
+
+            if (!sucesso)
+            {
+                return StatusCode(500, "Ocorreu um erro ao salvar as alterações.");
+            }
+
+            return Ok(GetVagaResources(vaga));
         }
     }
 }
