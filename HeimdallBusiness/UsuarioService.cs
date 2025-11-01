@@ -1,6 +1,7 @@
 using HeimdallModel;
 using HeimdallData; 
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace HeimdallBusiness
 {
@@ -15,21 +16,41 @@ namespace HeimdallBusiness
 
         public IQueryable<UsuarioModel> ListarUsuario()
         {
-            return _context.Usuarios.AsNoTracking().AsQueryable();
+            return _context.Usuarios
+                .Include(u => u.CategoriaUsuario)
+                .AsQueryable();
         }
 
         public UsuarioModel? ObterPorId(int id)
         {
-            return _context.Usuarios.Find(id);
+            
+            return _context.Usuarios
+                .Include(u => u.CategoriaUsuario)
+                .FirstOrDefault(u => u.id == id);
         }
 
         public UsuarioModel? ObterPorNome(string nome)
         {
-            return _context.Usuarios.FirstOrDefault(u => u.Nome == nome);
+            return _context.Usuarios
+                .Include(u => u.CategoriaUsuario)
+                .FirstOrDefault(u => u.Nome == nome);
         }
 
-        public UsuarioModel CadastrarUsuario(UsuarioModel user)
+      
+        public UsuarioModel? CadastrarUsuario(UsuarioModel user)
         {
+            // 1. Verifica se o Email já existe
+            if (_context.Usuarios.Any(u => u.Email == user.Email))
+            {
+                return null; 
+            }
+
+            // 2. Verifica se a CategoriaUsuarioId é válida
+            var categoriaExiste = _context.CategoriasUsuario.Find(user.CategoriaUsuarioId);
+            if (categoriaExiste == null)
+            {
+                return null; 
+            }
             _context.Usuarios.Add(user);
             _context.SaveChanges();
             return user;
@@ -40,15 +61,28 @@ namespace HeimdallBusiness
             var existente = _context.Usuarios.Find(user.id);
             if (existente == null) return false;
 
+            // 1. Verifica se o Email está a ser alterado para um que já existe
+            if (_context.Usuarios.Any(u => u.Email == user.Email && u.id != user.id))
+            {
+                return false; 
+            }
+
+            // 2. Verifica se a CategoriaUsuarioId é válida
+            var categoriaExiste = _context.CategoriasUsuario.Find(user.CategoriaUsuarioId);
+            if (categoriaExiste == null)
+            {
+                return false; 
+            }
+
             existente.Nome = user.Nome;
             existente.Sobrenome = user.Sobrenome;
             existente.DataNascimento = user.DataNascimento;
             existente.Cpf = user.Cpf;
             existente.Email = user.Email;
             existente.Senha = user.Senha;
-            existente.CategoriaUsuario = user.CategoriaUsuario;
+            existente.CategoriaUsuarioId = user.CategoriaUsuarioId; 
 
-            _context.Usuarios.Update(existente);
+
             _context.SaveChanges();
             return true;
         }
