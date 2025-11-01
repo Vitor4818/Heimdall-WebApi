@@ -16,21 +16,23 @@ namespace HeimdallBusiness
         //Listar vagas
         public IQueryable<VagaModel> ListarVagas()
         {
-            return _context.Vaga.AsNoTracking()
-            .AsQueryable()
-            .Include(v => v.Moto)
-            .Include(v => v.Zona);
+
+            return _context.Vaga
+                .Include(v => v.Moto)
+                .Include(v => v.Zona)
+                .AsNoTracking();
         }
 
         //Obter vagas por id
         public VagaModel? ObterPorId(int id)
         {
+            // --- A CORREÇÃO ---
             return _context.Vaga
-            .Include(v => v.Moto)
-            .Include(v => v.Zona)
-            .FirstOrDefault(v => v.Id == id);
+                .Include(v => v.Moto)
+                .Include(v => v.Zona)
+                .AsNoTracking()
+                .FirstOrDefault(v => v.Id == id);
         }
-
         //Cadastrar Vaga
         public VagaModel CadastrarVaga(VagaModel vaga)
         {

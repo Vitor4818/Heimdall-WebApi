@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using HeimdallModel;
 using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;
-namespace MotosApi.Controllers; // Presumi que este namespace estava correto no seu original
+namespace MotosApi.Controllers; 
 using Microsoft.EntityFrameworkCore;
-using MotosApi.SwaggerExamples; // Presumi que este namespace estava correto
+using MotosApi.SwaggerExamples; 
 using Swashbuckle.AspNetCore.Filters;
 
 [ApiController]
@@ -20,40 +20,34 @@ public class MotosController : ControllerBase
         this.linkGenerator = linkGenerator;
     }
 
-    /// <summary>
-    /// Método helper privado para formatar a resposta da Moto com links HATEOAS.
-    /// </summary>
+
     private object GetMotoResource(MotoModel moto)
     {
                 return new
-        {
-            // --- Propriedades Principais da Moto ---
-            moto.id,
-            moto.tipoMoto,
-            moto.placa,
-            moto.numChassi,
-            moto.VagaId, // O ID simples
+                {
+                    
+                    moto.id,
+                    moto.tipoMoto,
+                    moto.placa,
+                    moto.numChassi,
+                    moto.VagaId, 
 
-            // --- Objeto Vaga Aninhado (SUMÁRIO) ---
-            // CORREÇÃO: Formatamos a vaga manualmente para quebrar o ciclo.
-            vaga = moto.Vaga != null
-                ? new // Criamos um sumário da vaga
+                    
+                    vaga = moto.Vaga != null
+                ? new 
                 {
                     moto.Vaga.Id,
                     moto.Vaga.Codigo,
                     moto.Vaga.Ocupada,
                     moto.Vaga.ZonaId,
-                    // Note: Não incluímos moto.Vaga.Moto para quebrar o ciclo.
                     links = new
                     {
-                        // Adicionamos um link para o recurso completo da Vaga
                         self = linkGenerator.GetPathByAction(HttpContext, "GetById", "Vaga", new { id = moto.Vaga.Id })
                     }
                 }
-                : null, // Se VagaId for null, o objeto 'vaga' será null
+                : null,
 
-            // --- Objeto TagRfid Aninhado (SUMÁRIO) ---
-            tagRfid = moto.TagRfid != null
+                    tagRfid = moto.TagRfid != null
                 ? new
                 {
                     moto.TagRfid.Id,
@@ -64,15 +58,14 @@ public class MotosController : ControllerBase
                 }
                 : null,
 
-            // --- Links HATEOAS da Moto ---
-            links = new
-            {
-                self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
-                update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
-                delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
-                all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
-            }
-        };
+                    links = new
+                    {
+                        self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
+                        update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
+                        delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
+                        all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
+                    }
+                };
     }
 
 
@@ -95,13 +88,11 @@ public class MotosController : ControllerBase
 
         var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-        // Paginação direta no banco
         var motosPage = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        // Gera os links HATEOAS usando GetMotoResource
         var motosComLinks = motosPage.Select(m => GetMotoResource(m)).ToList();
 
         var result = new PagedResultDto<object>
@@ -138,7 +129,6 @@ public class MotosController : ControllerBase
         var moto = motoService.ObterPorId(id);
         if (moto == null) return NotFound();
 
-        // --- CORREÇÃO: Usar o método helper padronizado ---
         var resultado = GetMotoResource(moto);
 
         return Ok(resultado);
@@ -155,12 +145,10 @@ public class MotosController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult GetPorTipo([FromQuery] string tipo)
     {
-        // NOTA: ObterPorTipo parece retornar apenas UMA moto. 
-        // Se deveria retornar uma LISTA, este método precisa ser ajustado.
+
         var moto = motoService.ObterPorTipo(tipo); 
         if (moto == null) return NotFound();
 
-        // --- CORREÇÃO: Usar o método helper padronizado ---
         var resultado = GetMotoResource(moto);
 
         return Ok(resultado);
@@ -183,7 +171,6 @@ public class MotosController : ControllerBase
 
         var criada = motoService.CadastrarMoto(moto);
 
-        // --- CORREÇÃO: Usar o método helper padronizado ---
         var resultado = GetMotoResource(criada);
 
         return CreatedAtAction(nameof(Get), new { id = criada.id }, resultado);

@@ -3,7 +3,8 @@ using HeimdallModel;
 using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
-
+using System.Threading.Tasks;
+using System.Linq; 
 
 namespace HeimdallApi.Controllers
 {
@@ -47,7 +48,8 @@ namespace HeimdallApi.Controllers
                     self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "Vaga", new { id = vaga.Id }),
                     update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Vaga", new { id = vaga.Id }),
                     delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Vaga", new { id = vaga.Id }),
-                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Vaga")
+                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Vaga"),
+                    zonaResource = linkGenerator.GetPathByAction(HttpContext, "GetById", "Zona", new { id = vaga.ZonaId })
                 }
             };
         }
@@ -110,10 +112,12 @@ namespace HeimdallApi.Controllers
         //Reservado para example 
         public IActionResult Post([FromBody] VagaModel vaga)
         {
-            if (string.IsNullOrWhiteSpace(vaga.Codigo))
+            if (string.IsNullOrWhiteSpace(vaga.Codigo) || vaga.ZonaId <= 0)
             {
-                return BadRequest("Todos os campos da zona são obrigatórios.");
+                return BadRequest("O 'Codigo' da vaga é obrigatório e a 'ZonaId' deve ser válida (maior que 0).");
             }
+            
+
             var criada = vagaService.CadastrarVaga(vaga);
             var resource = GetVagaResources(criada);
             return CreatedAtAction(nameof(GetById), new { id = criada.Id }, resource);
@@ -123,7 +127,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [SwaggerOperation(Summary = "Atualiza uma vaga existente", Description = "Atualiza os dados de uma vaga já cadastrada.")]
+        [SwaggerOperation(Summary = "Atualiza uma vaga existente", Description = "Atualiza o Código e a ZonaId de uma vaga.")]
         //Reservado para example
         public IActionResult Put(int id, [FromBody] VagaModel vaga)
         {
@@ -131,17 +135,30 @@ namespace HeimdallApi.Controllers
             {
                 return BadRequest("Dados inconsistentes.");
             }
-
+            
             return vagaService.AtualizarVaga(vaga) ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)] 
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [SwaggerOperation(Summary = "Remove uma vaga", Description = "Remove uma vaga do sistema com base no ID.")]
+        [SwaggerOperation(Summary = "Remove uma vaga", Description = "Remove uma vaga do sistema, se ela não estiver ocupada.")]
         public IActionResult Delete(int id)
         {
-            return vagaService.RemoverVaga(id) ? NoContent() : NotFound();
+            var vaga = vagaService.ObterPorId(id);
+            if (vaga == null)
+            {
+                return NotFound(); 
+            }
+            var sucesso = vagaService.RemoverVaga(id);
+            if (!sucesso)
+            {
+                return BadRequest("Não é possível remover uma vaga que está ocupada.");
+            }
+            return NoContent(); 
+
         }
     }
 }
+

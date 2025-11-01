@@ -15,33 +15,32 @@ namespace HeimdallBusiness
         }
 
         
-public IQueryable<MotoModel> ListarTodas()
-{
-            return _context.Moto.AsNoTracking()
-            .AsQueryable()
-            .Include(m => m.TagRfid)
-            .Include(m => m.Vaga);
-}
+            public IQueryable<MotoModel> ListarTodas()
+            {
+                        return _context.Moto.
+                        AsNoTracking()
+                        .AsQueryable()
+                        .Include(m => m.TagRfid)
+                        .Include(m => m.Vaga);
+            }
 
- public MotoModel? ObterPorId(int id)
-{
-    return _context.Moto
-                   .Include(m => m.TagRfid)
-                   .Include(m => m.Vaga)
-                   .FirstOrDefault(m => m.id == id);
-}
-
-
-public MotoModel? ObterPorTipo(string tipo)
-{
-            return _context.Moto
-                           .Include(m => m.TagRfid)
-                           .Include(m => m.Vaga)
-                           .FirstOrDefault(m => m.tipoMoto == tipo);
-                   
-}
+            public MotoModel? ObterPorId(int id)
+            {
+                return _context.Moto
+                            .Include(m => m.TagRfid)
+                            .Include(m => m.Vaga)
+                            .FirstOrDefault(m => m.id == id);
+            }
 
 
+            public MotoModel? ObterPorTipo(string tipo)
+            {
+                        return _context.Moto
+                                    .Include(m => m.TagRfid)
+                                    .Include(m => m.Vaga)
+                                    .FirstOrDefault(m => m.tipoMoto == tipo);
+                            
+            }
 
         public MotoModel? CadastrarMoto(MotoModel moto)
         {
