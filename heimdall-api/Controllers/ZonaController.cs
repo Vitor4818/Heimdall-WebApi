@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HeimdallApi.Controllers
 {
-    [ApiController]
+    
     [Route("/api/[controller]")]
     public class ZonaController : ControllerBase
     {
@@ -113,6 +113,7 @@ namespace HeimdallApi.Controllers
             var resource = GetZonaResources(criada);
             return CreatedAtAction(nameof(GetById), new { id = criada.Id }, resource);
         }
+        
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

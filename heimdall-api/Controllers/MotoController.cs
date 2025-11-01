@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc; 
-using HeimdallModel;   
+using Microsoft.AspNetCore.Mvc;
+using HeimdallModel;
 using HeimdallBusiness;
-using Swashbuckle.AspNetCore.Annotations;  
-namespace MotosApi.Controllers;
+using Swashbuckle.AspNetCore.Annotations;
+namespace MotosApi.Controllers; 
 using Microsoft.EntityFrameworkCore;
-using MotosApi.SwaggerExamples;
+using MotosApi.SwaggerExamples; 
 using Swashbuckle.AspNetCore.Filters;
 
 [ApiController]
@@ -21,34 +21,52 @@ public class MotosController : ControllerBase
     }
 
 
-   private object GetMotoResource(MotoModel moto)
-{
-    return new
+    private object GetMotoResource(MotoModel moto)
     {
-        moto.id,
-        moto.tipoMoto,
-        moto.placa,
-        moto.numChassi,
-        tagRfid = moto.TagRfid != null
-            ? new
-            {
-                moto.TagRfid.Id,
-                moto.TagRfid.FaixaFrequencia,
-                moto.TagRfid.Banda,
-                moto.TagRfid.Aplicacao
-            }
-            : null,
-        links = new
-        {
-            self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
-            update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
-            delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
-            all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
-        }
-    };
-}
+                return new
+                {
+                    
+                    moto.id,
+                    moto.tipoMoto,
+                    moto.placa,
+                    moto.numChassi,
+                    moto.VagaId, 
 
+                    
+                    vaga = moto.Vaga != null
+                ? new 
+                {
+                    moto.Vaga.Id,
+                    moto.Vaga.Codigo,
+                    moto.Vaga.Ocupada,
+                    moto.Vaga.ZonaId,
+                    links = new
+                    {
+                        self = linkGenerator.GetPathByAction(HttpContext, "GetById", "Vaga", new { id = moto.Vaga.Id })
+                    }
+                }
+                : null,
 
+                    tagRfid = moto.TagRfid != null
+                ? new
+                {
+                    moto.TagRfid.Id,
+                    moto.TagRfid.MotoId,
+                    moto.TagRfid.FaixaFrequencia,
+                    moto.TagRfid.Banda,
+                    moto.TagRfid.Aplicacao
+                }
+                : null,
+
+                    links = new
+                    {
+                        self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
+                        update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
+                        delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
+                        all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
+                    }
+                };
+    }
 
 
     [HttpGet]
@@ -61,8 +79,8 @@ public class MotosController : ControllerBase
         if (page <= 0) page = 1;
         if (pageSize <= 0) pageSize = 10;
 
-        
-        var query = motoService.ListarTodas(); 
+
+        var query = motoService.ListarTodas();
 
         var totalItems = await query.CountAsync();
         if (totalItems == 0)
@@ -70,13 +88,11 @@ public class MotosController : ControllerBase
 
         var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-        // Paginação direta no banco
         var motosPage = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        // Gera os links HATEOAS usando GetMotoResource
         var motosComLinks = motosPage.Select(m => GetMotoResource(m)).ToList();
 
         var result = new PagedResultDto<object>
@@ -95,8 +111,8 @@ public class MotosController : ControllerBase
         };
 
         return Ok(result);
-    
-}
+
+    }
 
     [HttpGet("{id}")]
     [SwaggerOperation(
@@ -113,21 +129,7 @@ public class MotosController : ControllerBase
         var moto = motoService.ObterPorId(id);
         if (moto == null) return NotFound();
 
-        var resultado = new
-        {
-            moto.id,
-            moto.tipoMoto,
-            moto.TagRfid,
-            moto.placa,
-            moto.numChassi,
-            links = new
-            {
-                all = Url.Action(nameof(Get)),
-                self = Url.Action(nameof(Get), new { id = moto.id }),
-                update = Url.Action(nameof(Put), new { id = moto.id }),
-                delete = Url.Action(nameof(Delete), new { id = moto.id })
-            }
-        };
+        var resultado = GetMotoResource(moto);
 
         return Ok(resultado);
     }
@@ -141,25 +143,16 @@ public class MotosController : ControllerBase
     )]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-public IActionResult GetPorTipo([FromQuery] string tipo)
-{
-    var moto = motoService.ObterPorTipo(tipo);
-    if (moto == null) return NotFound();
+    public IActionResult GetPorTipo([FromQuery] string tipo)
+    {
 
-    var resultado = new {
-        moto.id,
-        moto.tipoMoto,
-        moto.placa,
-        moto.numChassi,
-        links = new {
-            self = Url.Action(nameof(Get), new { id = moto.id }),
-            update = Url.Action(nameof(Put), new { id = moto.id }),
-            delete = Url.Action(nameof(Delete), new { id = moto.id })
-        }
-    };
+        var moto = motoService.ObterPorTipo(tipo); 
+        if (moto == null) return NotFound();
 
-    return Ok(resultado);
-}
+        var resultado = GetMotoResource(moto);
+
+        return Ok(resultado);
+    }
 
     [HttpPost]
     [SwaggerOperation(
@@ -170,7 +163,7 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
     )]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))] 
+    [SwaggerRequestExample(typeof(MotoModel), typeof(MotoExample))]
     public IActionResult Post([FromBody] MotoModel moto)
     {
         if (string.IsNullOrWhiteSpace(moto.tipoMoto) || string.IsNullOrWhiteSpace(moto.placa))
@@ -178,18 +171,7 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
 
         var criada = motoService.CadastrarMoto(moto);
 
-        var resultado = new {
-            criada.id,
-            criada.tipoMoto,
-            criada.placa,
-            criada.numChassi,
-            links = new {
-                self = Url.Action(nameof(Get), new { id = criada.id }),
-                update = Url.Action(nameof(Put), new { id = criada.id }),
-                delete = Url.Action(nameof(Delete), new { id = criada.id }),
-                all = Url.Action(nameof(Get))
-            }
-        };
+        var resultado = GetMotoResource(criada);
 
         return CreatedAtAction(nameof(Get), new { id = criada.id }, resultado);
     }
@@ -227,3 +209,4 @@ public IActionResult GetPorTipo([FromQuery] string tipo)
         return motoService.Remover(id) ? NoContent() : NotFound();
     }
 }
+

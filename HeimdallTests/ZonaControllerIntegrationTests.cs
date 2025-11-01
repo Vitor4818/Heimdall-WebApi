@@ -19,7 +19,7 @@ namespace HeimdallTests
             _factory = factory;
             _client = factory.CreateClient();
 
-            // Reseta o banco antes de cada teste
+            //Reseta o banco antes de cada teste
             _factory.ResetDatabase(_factory.Services);
         }
 
@@ -92,7 +92,6 @@ namespace HeimdallTests
             var deleteResponse = await _client.DeleteAsync($"/api/zona/{zona.Id}");
 
             // Assert
-            //Verificar se o DELETE retornou NoContent
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
             var getResponse = await _client.GetAsync("/api/zona");

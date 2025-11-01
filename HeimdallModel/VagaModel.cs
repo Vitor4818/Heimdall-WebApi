@@ -18,7 +18,7 @@ public class VagaModel
     /// <summary>
     /// Indica se a vaga está ocupada.
     /// </summary>
-    public required bool Ocupada { get; set; }
+    public bool Ocupada { get; set; }
 
     /// <summary>
     /// Identificador da zona à qual a vaga pertence.

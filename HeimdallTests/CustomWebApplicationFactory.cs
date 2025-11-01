@@ -11,6 +11,9 @@ namespace HeimdallTests
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
+
+        private readonly string _databaseName = $"TestDb_{Guid.NewGuid()}";
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
 
@@ -19,7 +22,7 @@ namespace HeimdallTests
 
             builder.ConfigureServices(services =>
             {
-                // Removendo o "banco" original (contexto)
+                //Removendo o "banco" original (contexto)
                 var descriptor = services.SingleOrDefault(
                     d => d.ServiceType == typeof(DbContextOptions<AppDbContext>));
 
@@ -40,10 +43,11 @@ namespace HeimdallTests
                 //Adiciona o contexto em memória
                 services.AddDbContext<AppDbContext>(options => 
                 {
-                    options.UseInMemoryDatabase("TestDb");
+                    //Usa o nome único em vez do nome fixo "TestDb"
+                    options.UseInMemoryDatabase(_databaseName); 
                 });
 
-                // Iniciando o Db em memória
+                //Iniciando o Db em memória
                 var sp = services.BuildServiceProvider();
                 using var scope = sp.CreateScope();
                 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
@@ -58,11 +62,10 @@ namespace HeimdallTests
         public void ResetDatabase(IServiceProvider services)
         {
             using var scope = services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>(); 
-            
-            //Garante que o banco seja totalmente limpo e recriado entre os testes
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
         }
     }
 }
+

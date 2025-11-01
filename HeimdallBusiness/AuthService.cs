@@ -2,7 +2,7 @@ using HeimdallModel;
 using HeimdallData;
 using Microsoft.EntityFrameworkCore;
 
-namespace HeimdallBusiness // <--- isso deve bater com o using no controller
+namespace HeimdallBusiness 
 {
     public class AuthService
     {

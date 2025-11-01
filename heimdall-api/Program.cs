@@ -7,14 +7,14 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ Usa PostgreSQL normalmente, exceto nos testes
+//Usa PostgreSQL normalmente, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
-// NOTA: Se o ambiente for "Testing", o AppDbContext será injetado
-// pela CustomWebApplicationFactory em memória.
+//NOTA: Se o ambiente for "Testing", o AppDbContext será injetado
+//pela CustomWebApplicationFactory em memória.
 
 // Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
@@ -31,16 +31,16 @@ builder.Services.AddSwaggerGen(options =>
         Description = "API para gerenciar motos, usuários e RFID."
     });
 
-    // Habilita comentários XML
+    //Habilita comentários XML
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
 
-    // Habilita exemplos de payload
+    //Habilita exemplos de payload
     options.ExampleFilters();
 });
 
-// Registrando exemplos de payload no container
+//Registrando exemplos de payload no container
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>(); 
 
 // Injeção de dependências
@@ -49,6 +49,8 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MotoService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ZonaService>();
+builder.Services.AddScoped<VagaService>();
+
 
 
 builder.Services.AddControllers().AddJsonOptions(x =>
@@ -57,17 +59,17 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 var app = builder.Build();
 
 
-// --- MUDANÇA PRINCIPAL AQUI ---
-// Migrations e Seeding SÓ DEVEM OCORRER no ambiente real (não-Testing)
+//--- MUDANÇA PRINCIPAL AQUI ---
+//Migrations e Seeding SÓ DEVEM OCORRER no ambiente real (não-Testing)
 if (!app.Environment.IsEnvironment("Testing"))
 {
-    // 1. Bloco de Migração e Verificação de Conexão
+    // 1.Bloco de Migração e Verificação de Conexão
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         try
         {
-            // Aplica migrations pendentes
+            //Aplica migrations pendentes
             dbContext.Database.Migrate();
 
             if (dbContext.Database.CanConnect())
@@ -85,17 +87,17 @@ if (!app.Environment.IsEnvironment("Testing"))
         }
     }
 
-    // 2. Bloco do Seeder
+    //2. Bloco do Seeder
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         DbSeeder.SeedMotos(context);
     }
 }
-// --- FIM DA MUDANÇA ---
+//--- FIM DA MUDANÇA ---
 
 
-// Configuração do Swagger/ReDoc para Development
+//Configuração do Swagger/ReDoc para Development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
