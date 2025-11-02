@@ -2,6 +2,8 @@
 
 
 <ItemGroup>
+  <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
   <ProjectReference Include="..\HeimdallModel\HeimdallModel.csproj" />
   <ProjectReference Include="..\HeimdallData\HeimdallData.csproj" />
   <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.4" />

@@ -4,12 +4,15 @@ using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using System.Linq; 
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HeimdallApi.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
+    [Authorize]
+
     public class VagaController : ControllerBase
     {
         private readonly VagaService vagaService;

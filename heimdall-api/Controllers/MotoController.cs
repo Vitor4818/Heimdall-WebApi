@@ -7,10 +7,13 @@ using Microsoft.EntityFrameworkCore;
 using MotosApi.SwaggerExamples; 
 using Swashbuckle.AspNetCore.Filters;
 using System.Threading.Tasks; 
-using System.Linq; 
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
+
 public class MotosController : ControllerBase
 {
     private readonly MotoService motoService;

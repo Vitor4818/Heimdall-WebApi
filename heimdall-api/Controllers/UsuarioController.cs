@@ -6,13 +6,16 @@ using Microsoft.EntityFrameworkCore;
 using HeimdallApi.Examples; 
 using Swashbuckle.AspNetCore.Filters;
 using System.Threading.Tasks; 
-using System.Linq; 
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UsuariosApi.Controllers 
 {
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
+
     public class UsuarioController : ControllerBase
     {
         private readonly UsuarioService usuarioService;

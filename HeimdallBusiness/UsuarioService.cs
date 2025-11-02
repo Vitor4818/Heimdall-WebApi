@@ -2,6 +2,7 @@ using HeimdallModel;
 using HeimdallData; 
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using BCrypt.Net; 
 
 namespace HeimdallBusiness
 {
@@ -23,7 +24,6 @@ namespace HeimdallBusiness
 
         public UsuarioModel? ObterPorId(int id)
         {
-            
             return _context.Usuarios
                 .Include(u => u.CategoriaUsuario)
                 .FirstOrDefault(u => u.id == id);
@@ -36,7 +36,31 @@ namespace HeimdallBusiness
                 .FirstOrDefault(u => u.Nome == nome);
         }
 
-      
+        
+       
+        public UsuarioModel? Login(string email, string senha)
+        {
+            var usuario = _context.Usuarios
+                                .Include(u => u.CategoriaUsuario) 
+                                .FirstOrDefault(u => u.Email == email);
+
+            // 1. Verifica se o usuário existe
+            if (usuario == null)
+            {
+                return null; 
+            }
+
+            // 2. Verifica a senha (BCrypt)
+            if (!BCrypt.Net.BCrypt.Verify(senha, usuario.Senha))
+            {
+                return null; 
+            }
+
+            // 3. Sucesso
+            return usuario;
+        }
+
+
         public UsuarioModel? CadastrarUsuario(UsuarioModel user)
         {
             // 1. Verifica se o Email já existe
@@ -51,11 +75,15 @@ namespace HeimdallBusiness
             {
                 return null; 
             }
+
+            user.Senha = BCrypt.Net.BCrypt.HashPassword(user.Senha);
+
             _context.Usuarios.Add(user);
             _context.SaveChanges();
             return user;
         }
 
+    
         public bool AtualizarUsuario(UsuarioModel user)
         {
             var existente = _context.Usuarios.Find(user.id);
@@ -79,9 +107,7 @@ namespace HeimdallBusiness
             existente.DataNascimento = user.DataNascimento;
             existente.Cpf = user.Cpf;
             existente.Email = user.Email;
-            existente.Senha = user.Senha;
             existente.CategoriaUsuarioId = user.CategoriaUsuarioId; 
-
 
             _context.SaveChanges();
             return true;
@@ -98,3 +124,4 @@ namespace HeimdallBusiness
         }
     }
 }
+

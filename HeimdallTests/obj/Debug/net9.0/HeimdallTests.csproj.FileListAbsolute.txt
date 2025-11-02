@@ -318,6 +318,8 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\re
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\refs\System.Xml.XPath.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\refs\System.Xml.XPath.XDocument.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\refs\WindowsBase.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\BCrypt.Net-Next.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.Testing.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.AspNetCore.TestHost.dll
@@ -356,6 +358,12 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Mi
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.OpenApi.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.TestPlatform.CoreUtilities.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Microsoft.TestPlatform.PlatformAbstractions.dll
@@ -381,6 +389,7 @@ C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\Sy
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\System.Diagnostics.EventLog.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\System.Diagnostics.PerformanceCounter.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\System.DirectoryServices.Protocols.dll
+C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\xunit.abstractions.dll
 C:\Users\Vitor Gomes\Documents\Heimdall-WebApi\HeimdallTests\bin\Debug\net9.0\xunit.assert.dll
