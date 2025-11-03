@@ -4,8 +4,63 @@ using HeimdallData;
 using System.Text.Json.Serialization;
 using Redoc.AspNetCore;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi.Models; 
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+
+// --- Configuração do JWT ---
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new InvalidOperationException("Chave JWT (Jwt:Key) não encontrada ou está vazia no appsettings.json.");
+}
+var key = Encoding.ASCII.GetBytes(jwtKey);
+
+// 1. Adiciona Autenticação (JWT)
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // Mude para 'true' em produção (com HTTPS)
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true, 
+        IssuerSigningKey = new SymmetricSecurityKey(key), 
+
+        ValidateIssuer = true, 
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        
+        ValidateLifetime = true, 
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// 2. Adiciona Autorização
+builder.Services.AddAuthorization();
+// --- FIM DA Configuração do JWT ---
+
+
+
+
+
+
+
+
+
+
+
 
 //Usa PostgreSQL normalmente, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
@@ -47,9 +102,9 @@ builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
 builder.Services.AddScoped<TagRfidService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MotoService>();
-builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ZonaService>();
 builder.Services.AddScoped<VagaService>();
+builder.Services.AddScoped<TokenService>();
 
 
 

@@ -6,12 +6,15 @@ using Microsoft.EntityFrameworkCore;
 using HeimdallApi.SwaggerExamples.TagRfid;
 using Swashbuckle.AspNetCore.Filters;
 using System.Threading.Tasks; 
-using System.Linq; 
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HeimdallApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
+
     public class TagRfidController : ControllerBase
     {
         private readonly TagRfidService tagService;

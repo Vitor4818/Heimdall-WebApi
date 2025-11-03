@@ -10,6 +10,7 @@ using System;
 
 namespace HeimdallTests
 {
+
     public class TagRfidControllerIntegrationTests : IDisposable
     {
         private readonly HttpClient _client;
@@ -17,14 +18,12 @@ namespace HeimdallTests
 
         public TagRfidControllerIntegrationTests()
         {
-            // --- ISOLAMENTO (CORREÇÃO DO RACE CONDITION) ---
             _factory = new CustomWebApplicationFactory();
             _client = _factory.CreateClient();
         }
 
         public void Dispose()
         {
-            // Limpa os recursos (o cliente e a factory)
             _client.Dispose();
             _factory.Dispose();
         }
@@ -59,23 +58,23 @@ namespace HeimdallTests
         [Fact]
         public async Task Get_Tags_DeveRetornarNoContent_QuandoBancoVazio()
         {
-            // Agir (Act)
+            // Act
             var response = await _client.GetAsync("/api/tagrfid");
 
-            // Verificar (Assert)
+            // Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Fact]
         public async Task Post_Tag_DeveCadastrarComSucesso_ComMotoIdZero()
         {
-            // Organizar (Arrange)
-            var payloadTagLivre = CriarPayloadTag(1, 0); 
+            // Arrange
+            var payloadTagLivre = CriarPayloadTag(1, 0);
 
-            // Agir (Act)
+            // Act
             var response = await _client.PostAsJsonAsync("/api/tagrfid", payloadTagLivre);
 
-            // Verificar (Assert)
+            // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -87,14 +86,14 @@ namespace HeimdallTests
         [Fact]
         public async Task Post_Tag_DeveCadastrarComSucesso_ComMotoIdValido()
         {
-            // Organizar (Arrange)
-            await CriarMotoAsync(10);
+            // Arrange
+            await CriarMotoAsync(10); 
             var payloadTagVinculada = CriarPayloadTag(1, 10); 
 
-            // Agir (Act)
+            // Act
             var response = await _client.PostAsJsonAsync("/api/tagrfid", payloadTagVinculada);
 
-            // Verificar (Assert)
+            // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             
@@ -106,22 +105,22 @@ namespace HeimdallTests
         [Fact]
         public async Task Put_Tag_DeveAtualizarComSucesso()
         {
-            // Organizar (Arrange)
-            await CriarMotoAsync(10); // Moto 10
-            await CriarMotoAsync(11); // Moto 11
+            // Arrange
+            await CriarMotoAsync(10); 
+            await CriarMotoAsync(11); 
             
             var payloadTag = CriarPayloadTag(1, 10);
             (await _client.PostAsJsonAsync("/api/tagrfid", payloadTag)).EnsureSuccessStatusCode();
-
             var payloadAtualizado = new { Id = 1, Banda = "VHF", Aplicacao = "Atualizado", FaixaFrequencia = "900MHz", MotoId = 11 };
 
-            // Agir (Act)
+            // Act
             var response = await _client.PutAsJsonAsync("/api/tagrfid/1", payloadAtualizado);
 
-            // Verificar (Assert)
+            // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             var getResponse = await _client.GetAsync("/api/tagrfid/1");
+            getResponse.EnsureSuccessStatusCode(); 
             var json = await getResponse.Content.ReadAsStringAsync();
             var root = JsonDocument.Parse(json).RootElement;
             Assert.Equal("VHF", root.GetProperty("banda").GetString());
@@ -131,15 +130,15 @@ namespace HeimdallTests
         [Fact]
         public async Task Delete_Tag_DeveSucesso_MesmoSeTagVinculadaAMoto()
         {
-            // Organizar (Arrange)
+            // Arrange
             await CriarMotoAsync(10);
             var payloadTag = CriarPayloadTag(1, 10);
             (await _client.PostAsJsonAsync("/api/tagrfid", payloadTag)).EnsureSuccessStatusCode();
             
-            // Agir (Act)
+            // Act
             var response = await _client.DeleteAsync("/api/tagrfid/1");
 
-            // Verificar (Assert)
+            // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
@@ -147,14 +146,14 @@ namespace HeimdallTests
         [Fact]
         public async Task Delete_Tag_DeveSucesso_SeTagLivre()
         {
-            // Organizar (Arrange)
-            var payloadTag = CriarPayloadTag(1, 0);
+            // Arrange
+            var payloadTag = CriarPayloadTag(1, 0); 
             (await _client.PostAsJsonAsync("/api/tagrfid", payloadTag)).EnsureSuccessStatusCode();
 
-            // Agir (Act)
+            // Act
             var response = await _client.DeleteAsync("/api/tagrfid/1");
 
-            // Verificar (Assert)
+            // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }

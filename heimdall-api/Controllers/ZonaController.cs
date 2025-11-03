@@ -3,13 +3,17 @@ using HeimdallModel;
 using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 
 
 namespace HeimdallApi.Controllers
 {
-    
+
+    [ApiController]
     [Route("/api/[controller]")]
+    [Authorize]
+
     public class ZonaController : ControllerBase
     {
 

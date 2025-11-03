@@ -10,58 +10,70 @@ using System;
 
 namespace HeimdallTests
 {
-    public class VagaControllerIntegrationTests : IClassFixture<CustomWebApplicationFactory>
+    public class VagaControllerIntegrationTests : IDisposable
     {
         private readonly HttpClient _client;
         private readonly CustomWebApplicationFactory _factory;
 
-        public VagaControllerIntegrationTests(CustomWebApplicationFactory factory)
+        public VagaControllerIntegrationTests()
         {
-            _factory = factory;
-            _client = factory.CreateClient();
-
-            _factory.ResetDatabase(_factory.Services);
+            _factory = new CustomWebApplicationFactory();
+            _client = _factory.CreateClient();
         }
 
-        /// <summary>
-        /// Helper para desserializar a resposta paginada
-        /// </summary>
-        private PagedResultDto<JsonElement> DeserializePagedResult(string json)
+        public void Dispose()
         {
-            return JsonSerializer.Deserialize<PagedResultDto<JsonElement>>(json, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            _client.Dispose();
+            _factory.Dispose();
         }
+
+        private async Task SetupZonaEVagaLivreAsync(int zonaId = 1, int vagaId = 1, string codigoVaga = "V1")
+        {
+            // 1. Cria Zona
+            var zona = new ZonaModel { Id = zonaId, Nome = $"Zona {zonaId}", Tipo = "Comercial" };
+            (await _client.PostAsJsonAsync("/api/zona", zona)).EnsureSuccessStatusCode();
+
+            // 2. Cria Vaga 
+            var vaga = new { Id = vagaId, Codigo = codigoVaga, ZonaId = zonaId, Ocupada = false };
+            (await _client.PostAsJsonAsync("/api/vaga", vaga)).EnsureSuccessStatusCode();
+        }
+        
+        private async Task OcuparVagaComMotoAsync(int vagaId, int motoId)
+        {
+             var moto = new 
+             { 
+                id = motoId, 
+                tipoMoto = "Sport", 
+                placa = $"ABC{motoId}", 
+                numChassi = $"123{motoId}", 
+                VagaId = vagaId 
+             };
+            (await _client.PostAsJsonAsync("/api/motos", moto)).EnsureSuccessStatusCode();
+        }
+
 
         [Fact]
         public async Task Get_Vagas_DeveRetornarNoContent_QuandoBancoVazio()
         {
-            // Organizar (Arrange)
-            // O banco é limpo no construtor
-
-            // Agir (Act)
+            // Act
             var response = await _client.GetAsync("/api/vaga");
 
-            // Verificar (Assert)
+            // Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         [Fact]
         public async Task Post_Vaga_DeveCadastrarVaga_EIgnorarOcupada()
         {
-            // Organizar (Arrange)
-            // 1. Precisamos de uma Zona para que o .Include(v => v.Zona) funcione
+            // Arrange
             var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
-            await _client.PostAsJsonAsync("/api/zona", zona);
-
-            // 2. Cria a vaga, tentando forçar 'ocupada = true'
+            (await _client.PostAsJsonAsync("/api/zona", zona)).EnsureSuccessStatusCode();
             var novaVaga = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true };
 
-            // Agir (Act)
+            // Act
             var response = await _client.PostAsJsonAsync("/api/vaga", novaVaga);
 
-            // Verificar (Assert)
+            // Assert
             response.EnsureSuccessStatusCode(); 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -69,7 +81,6 @@ namespace HeimdallTests
             var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
-            // REGRA DE NEGÓCIO: Verifica se 'ocupada' foi forçado para 'false' pelo VagaService
             Assert.Equal("V1", root.GetProperty("codigo").GetString());
             Assert.False(root.GetProperty("ocupada").GetBoolean());
         }
@@ -77,111 +88,72 @@ namespace HeimdallTests
         [Fact]
         public async Task Put_Vaga_DeveAtualizarVaga_EIgnorarOcupada()
         {
-            // Organizar (Arrange)
-            // 1. Cria Zona
-            var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
-            await _client.PostAsJsonAsync("/api/zona", zona);
-            // 2. Cria Vaga (que começa 'ocupada = false')
-            var vaga = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false };
-            await _client.PostAsJsonAsync("/api/vaga", vaga);
-
-            // 3. Vaga atualizada, tentando forçar 'ocupada = true'
+            // Arrange
+            await SetupZonaEVagaLivreAsync(1, 1, "V1"); 
             var vagaAtualizada = new { Id = 1, Codigo = "V1-Modificado", ZonaId = 1, Ocupada = true };
 
-            //Agir (Act)
+            // Act
             var putResponse = await _client.PutAsJsonAsync("/api/vaga/1", vagaAtualizada);
 
-            //Verificar (Assert)
-            putResponse.EnsureSuccessStatusCode(); // <-- CORREÇÃO: Garante que o PUT funcionou
+            // Assert
+            putResponse.EnsureSuccessStatusCode(); 
             Assert.Equal(HttpStatusCode.NoContent, putResponse.StatusCode);
-
-            //Verifica se os dados mudaram E se 'ocupada' foi ignorado
             var getResponse = await _client.GetAsync("/api/vaga/1");
-            
             getResponse.EnsureSuccessStatusCode(); 
             var json = await getResponse.Content.ReadAsStringAsync();
             var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
-
             Assert.Equal("V1-Modificado", root.GetProperty("codigo").GetString());
-            // REGRA DE NEGÓCIO: 'ocupada' deve ter permanecido 'false'
             Assert.False(root.GetProperty("ocupada").GetBoolean());
         }
 
         [Fact]
         public async Task Delete_Vaga_DeveFalhar_SeVagaEstiverOcupada()
         {
-            // Organizar (Arrange)
-            // 1. Cria Zona e Vaga
-            var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
-            await _client.PostAsJsonAsync("/api/zona", zona);
-            var vaga = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false };
-            await _client.PostAsJsonAsync("/api/vaga", vaga);
+            // Arrange
+            await SetupZonaEVagaLivreAsync(1, 1, "V1");
+            await OcuparVagaComMotoAsync(1, 10); 
 
-            // 2. Cria uma Moto e a ASSOCIA à Vaga 1. Isso força Vaga 1 -> Ocupada = true
-            var moto = new { id = 10, tipoMoto = "Sport", placa = "ABC1234", numChassi = "123", VagaId = 1 };
-            var motoResponse = await _client.PostAsJsonAsync("/api/motos", moto);
-            
-            // Adicionamos isso para garantir que o 'Arrange' funcionou
-            motoResponse.EnsureSuccessStatusCode(); 
-
-            // Agir (Act)
-            //Tenta deletar a Vaga 1, que agora está ocupada pela moto
+            // Act
             var deleteResponse = await _client.DeleteAsync("/api/vaga/1");
 
-            // Verificar (Assert)
-            //REGRA DE NEGÓCIO: O VagaService não permite deletar vaga ocupada.
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, deleteResponse.StatusCode);
         }
 
         [Fact]
         public async Task Delete_Vaga_DeveSucesso_SeVagaEstiverLivre()
         {
-            // Organizar (Arrange)
-            var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
-            await _client.PostAsJsonAsync("/api/zona", zona);
-            var vaga = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false }; // Vaga está livre
-            await _client.PostAsJsonAsync("/api/vaga", vaga);
+            // Arrange
+            await SetupZonaEVagaLivreAsync(1, 1, "V1"); 
 
-            // Agir (Act)
+            // Act
             var deleteResponse = await _client.DeleteAsync("/api/vaga/1");
 
-            // Verificar (Assert)
-            deleteResponse.EnsureSuccessStatusCode();
+            // Assert
+            deleteResponse.EnsureSuccessStatusCode(); 
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
         }
-        
 
+        #region Testes de LiberarVaga (PATCH)
 
         [Fact]
         public async Task LiberarVaga_DeveRetornarOk_QuandoVagaOcupada()
         {
-            // Organizar (Arrange)
-            // 1. Cria Zona, Vaga e Moto (associada à vaga)
-            var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
-            (await _client.PostAsJsonAsync("/api/zona", zona)).EnsureSuccessStatusCode();
-            
-            var vaga = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false };
-            (await _client.PostAsJsonAsync("/api/vaga", vaga)).EnsureSuccessStatusCode();
-            
-            var moto = new { id = 10, tipoMoto = "Sport", placa = "ABC1234", numChassi = "123", VagaId = 1 };
-            (await _client.PostAsJsonAsync("/api/motos", moto)).EnsureSuccessStatusCode(); 
+            // Arrange
+            await SetupZonaEVagaLivreAsync(1, 1, "V1"); 
+            await OcuparVagaComMotoAsync(1, 10); 
 
-            // Agir (Act)
-            // Libera a Vaga 1, que está ocupada pela moto
+            // Act
             var patchResponse = await _client.PatchAsync("/api/vaga/1/liberar", null);
 
-            // Verificar (Assert)
+            // Assert
             patchResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode); 
-
-            // 1. Verifica se o JSON retornado pelo PATCH está correto
             var json = await patchResponse.Content.ReadAsStringAsync();
             var root = JsonDocument.Parse(json).RootElement;
             Assert.False(root.GetProperty("ocupada").GetBoolean()); 
             Assert.Equal(JsonValueKind.Null, root.GetProperty("moto").ValueKind); 
-
-            // 2. Double-check: Verifica no GET se a Vaga está realmente livre
             var getResponse = await _client.GetAsync("/api/vaga/1");
             var getJson = await getResponse.Content.ReadAsStringAsync();
             var getRoot = JsonDocument.Parse(getJson).RootElement;
@@ -192,36 +164,27 @@ namespace HeimdallTests
         [Fact]
         public async Task LiberarVaga_DeveRetornarBadRequest_QuandoVagaJaLivre()
         {
-            // Organizar (Arrange)
-            // 1. Cria Zona e Vaga (que já está livre por defeito)
-            var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
-            (await _client.PostAsJsonAsync("/api/zona", zona)).EnsureSuccessStatusCode();
-            
-            var vaga = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false };
-            (await _client.PostAsJsonAsync("/api/vaga", vaga)).EnsureSuccessStatusCode();
+            // Arrange
+            await SetupZonaEVagaLivreAsync(1, 1, "V1"); 
 
-            // Agir (Act)
-            // Tenta liberar uma vaga que já está livre
+            // Act
             var patchResponse = await _client.PatchAsync("/api/vaga/1/liberar", null);
 
-            // Verificar (Assert)
-            // O VagaController deve detetar que a vaga já está livre
+            // Assert
             Assert.Equal(HttpStatusCode.BadRequest, patchResponse.StatusCode);
         }
 
         [Fact]
         public async Task LiberarVaga_DeveRetornarNotFound_QuandoVagaNaoExiste()
         {
-            // Agir (Act)
-            // Tenta liberar uma vaga que não existe
+            // Act
             var patchResponse = await _client.PatchAsync("/api/vaga/99/liberar", null);
 
-            // Verificar (Assert)
-            // O VagaController deve retornar 404
+            // Assert
             Assert.Equal(HttpStatusCode.NotFound, patchResponse.StatusCode);
         }
 
-       
+        #endregion
     }
 }
 
