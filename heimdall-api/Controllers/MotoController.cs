@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 
-[ApiController]
-[Route("api/[controller]")]
+[ApiController] 
+[ApiVersion("1.0")] 
+[Route("api/v{version:apiVersion}/[controller]")] 
 [Authorize]
 
 public class MotosController : ControllerBase
@@ -60,10 +61,10 @@ public class MotosController : ControllerBase
                 : null,
             links = new
             {
-                self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { id = moto.id }),
-                update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { id = moto.id }),
-                delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { id = moto.id }),
-                all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos")
+                self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { version = "1.0", id = moto.id }),
+                update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Motos", new { version = "1.0", id = moto.id }),
+                delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Motos", new { version = "1.0", id = moto.id }),
+                all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Motos", new { version = "1.0" })
             }
         };
     }

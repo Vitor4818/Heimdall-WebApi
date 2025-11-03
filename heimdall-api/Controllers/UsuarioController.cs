@@ -13,7 +13,8 @@ namespace UsuariosApi.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")] 
+    [Route("api/v{version:apiVersion}/[controller]")] 
     [Authorize]
 
     public class UsuarioController : ControllerBase
@@ -44,10 +45,10 @@ namespace UsuariosApi.Controllers
                 } : null,
                 links = new
                 {
-                    self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { id = usuario.id }),
-                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Usuario", new { id = usuario.id }),
-                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Usuario", new { id = usuario.id }),
-                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario")
+                    self = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new { version = "1.0", id = usuario.id }),
+                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Usuario", new { version = "1.0", id = usuario.id }),
+                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Usuario", new { version = "1.0", id = usuario.id }),
+                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Usuario", new{ version = "1.0"})
                 }
             };
         }

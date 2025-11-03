@@ -11,7 +11,8 @@ namespace HeimdallApi.Controllers
 {
 
     [ApiController]
-    [Route("/api/[controller]")]
+    [ApiVersion("1.0")] 
+    [Route("api/v{version:apiVersion}/[controller]")] 
     [Authorize]
 
     public class ZonaController : ControllerBase
@@ -37,10 +38,10 @@ namespace HeimdallApi.Controllers
                 zona.Vagas,
                 links = new
                 {
-                    self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "Zona", new { id = zona.Id }),
-                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Zona", new { id = zona.Id }),
-                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Zona", new { id = zona.Id }),
-                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Zona")
+                    self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "Zona", new { version = "1.0", id = zona.Id }),
+                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Zona", new { version = "1.0", id = zona.Id }),
+                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Zona", new { version = "1.0", id = zona.Id }),
+                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Zona", new {  version = "1.0"})
                 }
 
             };

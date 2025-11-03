@@ -10,6 +10,7 @@ using System;
 
 namespace HeimdallTests
 {
+
     public class UsuarioControllerIntegrationTests : IDisposable
     {
         private readonly HttpClient _client;
@@ -65,9 +66,9 @@ namespace HeimdallTests
              
              if (categoriaId != 2)
              {
-                payload.GetType().GetProperty("CategoriaUsuarioId")!.SetValue(payload, categoriaId);
+                 payload.GetType().GetProperty("CategoriaUsuarioId")!.SetValue(payload, categoriaId);
              }
-             var response = await _client.PostAsJsonAsync("/api/auth/registrar", payload);
+             var response = await _client.PostAsJsonAsync("/api/v1/auth/registrar", payload);
              response.EnsureSuccessStatusCode();
          }
 
@@ -83,12 +84,13 @@ namespace HeimdallTests
             usuarioAtualizado.Nome = "Vitor Editado";
 
             // Act
-            var response = await _client.PutAsJsonAsync("/api/usuario/1", usuarioAtualizado);
+            var response = await _client.PutAsJsonAsync("/api/v1/usuario/1", usuarioAtualizado);
 
             // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            var getResponse = await _client.GetAsync("/api/usuario/1");
+            
+            var getResponse = await _client.GetAsync("/api/v1/usuario/1");
             getResponse.EnsureSuccessStatusCode();
             var json = await getResponse.Content.ReadAsStringAsync();
             var root = JsonDocument.Parse(json).RootElement;
@@ -106,7 +108,7 @@ namespace HeimdallTests
             var usuarioAtualizado = CriarPayloadAtualizacao(1, "testeB@email.com"); 
 
             // Act
-            var response = await _client.PutAsJsonAsync("/api/usuario/1", usuarioAtualizado);
+            var response = await _client.PutAsJsonAsync("/api/v1/usuario/1", usuarioAtualizado);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -121,7 +123,7 @@ namespace HeimdallTests
             var usuarioAtualizado = CriarPayloadAtualizacao(1, "teste@email.com", 99); 
 
             // Act
-            var response = await _client.PutAsJsonAsync("/api/usuario/1", usuarioAtualizado);
+            var response = await _client.PutAsJsonAsync("/api/v1/usuario/1", usuarioAtualizado);
 
             // Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -134,7 +136,7 @@ namespace HeimdallTests
             var usuario = CriarPayloadAtualizacao(99, "teste@email.com"); 
 
             // Act
-            var response = await _client.PutAsJsonAsync("/api/usuario/99", usuario);
+            var response = await _client.PutAsJsonAsync("/api/v1/usuario/99", usuario);
 
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
