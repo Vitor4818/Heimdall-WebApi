@@ -59,7 +59,6 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult Login([FromBody] LoginDto loginDto)
         {
-            // 1. O UsuarioService (corrigido) agora verifica o hash do BCrypt
             var usuario = _usuarioService.Login(loginDto.Email, loginDto.Senha);
 
             if (usuario == null)
