@@ -11,8 +11,9 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace HeimdallApi.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController] 
+    [ApiVersion("1.0")] 
+    [Route("api/v{version:apiVersion}/[controller]")] 
     [Authorize]
 
     public class TagRfidController : ControllerBase
@@ -37,10 +38,10 @@ namespace HeimdallApi.Controllers
                 tag.Aplicacao,
                 links = new
                 {
-                    self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "TagRfid", new { id = tag.Id }),
-                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "TagRfid", new { id = tag.Id }),
-                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "TagRfid", new { id = tag.Id }),
-                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "TagRfid")
+                    self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "TagRfid", new { version = "1.0", id = tag.Id }),
+                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "TagRfid", new { version = "1.0", id = tag.Id }),
+                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "TagRfid", new { version = "1.0", id = tag.Id }),
+                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "TagRfid", new { version = "1.0"})
                 }
             };
         }

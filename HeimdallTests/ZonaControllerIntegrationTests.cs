@@ -32,7 +32,7 @@ namespace HeimdallTests
         public async Task Get_Zonas_RetornaListaVazia()
         {
             //Act
-            var response = await _client.GetAsync("/api/zona");
+            var response = await _client.GetAsync("/api/v1/zona");
             
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -45,7 +45,7 @@ namespace HeimdallTests
             var zona = new ZonaModel { Id = 10, Nome = "Zona Teste", Tipo = "Residencial" };
 
             //Act
-            var response = await _client.PostAsJsonAsync("/api/zona", zona);
+            var response = await _client.PostAsJsonAsync("/api/v1/zona", zona);
 
             //Assert
             response.EnsureSuccessStatusCode();
@@ -61,17 +61,16 @@ namespace HeimdallTests
         {
             // Arrange
             var zonaInicial = new ZonaModel { Id = 2, Nome = "Zona Inicial", Tipo = "Comercial" };
-            (await _client.PostAsJsonAsync("/api/zona", zonaInicial)).EnsureSuccessStatusCode();
-            
+            (await _client.PostAsJsonAsync("/api/v1/zona", zonaInicial)).EnsureSuccessStatusCode();
             var zonaAtualizada = new ZonaModel { Id = zonaInicial.Id, Nome = "Zona Atualizada", Tipo = "Residencial" };
 
             //Act
-            var putResponse = await _client.PutAsJsonAsync($"/api/zona/{zonaInicial.Id}", zonaAtualizada);
+            var putResponse = await _client.PutAsJsonAsync($"/api/v1/zona/{zonaInicial.Id}", zonaAtualizada);
 
             // Assert
             putResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, putResponse.StatusCode);
-            var getResponse = await _client.GetAsync("/api/zona");
+            var getResponse = await _client.GetAsync("/api/v1/zona");
             getResponse.EnsureSuccessStatusCode();
             var content = await getResponse.Content.ReadAsStringAsync();
             var paged = JsonSerializer.Deserialize<PagedResultDto<JsonElement>>(content, new JsonSerializerOptions
@@ -89,15 +88,16 @@ namespace HeimdallTests
         {
             // Arrange
             var zona = new ZonaModel { Id = 3, Nome = "Zona Para Remover", Tipo = "Comercial" };
-            (await _client.PostAsJsonAsync("/api/zona", zona)).EnsureSuccessStatusCode();
+            (await _client.PostAsJsonAsync("/api/v1/zona", zona)).EnsureSuccessStatusCode();
 
             // Act
-            var deleteResponse = await _client.DeleteAsync($"/api/zona/{zona.Id}");
+            var deleteResponse = await _client.DeleteAsync($"/api/v1/zona/{zona.Id}");
 
             // Assert
             deleteResponse.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
-            var getResponse = await _client.GetAsync("/api/zona");
+            
+            var getResponse = await _client.GetAsync("/api/v1/zona");
             Assert.Equal(HttpStatusCode.NoContent, getResponse.StatusCode);
         }
     }

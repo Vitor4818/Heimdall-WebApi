@@ -10,13 +10,16 @@ using System.Text;
 using Microsoft.OpenApi.Models; 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
-using System.Text.Json;
+// --- Imports para Versionamento ---
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
+// --- Fim dos Imports ---
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 
-// JWT 
+// --- Configuração do JWT ---
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKey))
 {
@@ -24,7 +27,7 @@ if (string.IsNullOrEmpty(jwtKey))
 }
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
-//Adiciona Autenticação (JWT)
+// 1. Adiciona Autenticação (JWT)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,9 +53,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-//Adiciona Autorização
+// 2. Adiciona Autorização
 builder.Services.AddAuthorization();
-//--- FIM JWT ---
+// --- FIM DA Configuração do JWT ---
 
 //Usa PostgreSQL, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
@@ -65,16 +68,36 @@ if (!builder.Environment.IsEnvironment("Testing"))
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// --- ADICIONA O SERVIÇO DE VERSIONAMENTO ---
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true; // Reporta as versões no header 'api-supported-versions'
+    options.AssumeDefaultVersionWhenUnspecified = true; // Assume a v1.0 se o cliente não especificar
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0); // Define a versão padrão como 1.0
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(), // Lê a versão do URL (ex: /api/v1/...)
+        new HeaderApiVersionReader("x-api-version") // Lê a versão de um header (opcional)
+    );
+});
+
+// Faz o versionamento funcionar com o Swagger
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV"; // Formata o nome do grupo para 'v1', 'v2', etc.
+    options.SubstituteApiVersionInUrl = true; // Substitui {version:apiVersion} no URL
+});
+// --- FIM DO SERVIÇO DE VERSIONAMENTO ---
+
 
 builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations(); 
-    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "Heimdall API",
-        Version = "v1",
-        Description = "API para gerenciar motos, usuários e RFID."
-    });
+    
+    // --- ALTERAÇÃO (VERSIONAMENTO) ---
+    // Removemos o options.SwaggerDoc("v1", ...) estático.
+    // O Swagger agora irá gerar a documentação com base nas versões descobertas.
+    // (O IApiVersionDescriptionProvider será injetado no 'app' mais abaixo)
+    // --- FIM DA ALTERAÇÃO ---
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -125,6 +148,7 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+// Health Checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -133,6 +157,11 @@ builder.Services.AddHealthChecks()
         tags: new[] { "db", "postgres" });
 
 var app = builder.Build();
+
+// --- ALTERAÇÃO (VERSIONAMENTO) ---
+// Obtém o provedor de descrição de versão da API (necessário para o loop do Swagger)
+var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+// --- FIM DA ALTERAÇÃO ---
 
 
 if (!app.Environment.IsEnvironment("Testing"))
@@ -173,7 +202,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Heimdall API v1");
+        // --- ALTERAÇÃO (VERSIONAMENTO) ---
+        // Faz um loop por todas as versões descobertas (ex: v1, v2) e cria um endpoint do Swagger para cada uma
+        foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+        {
+            c.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json", 
+                description.GroupName.ToUpperInvariant()
+            );
+        }
+        // --- FIM DA ALTERAÇÃO ---
+        
         c.RoutePrefix = "swagger";
     });
 
@@ -188,7 +227,7 @@ app.UseHttpsRedirection();
 
 
 app.UseAuthentication(); 
-app.UseAuthorization();  
+app.UseAuthorization(); 
 
 
 app.MapHealthChecks("/health", new HealthCheckOptions

@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 namespace HeimdallApi.Controllers
 {
     [ApiController]
-    [Route("/api/[controller]")]
+    [ApiVersion("1.0")] 
+    [Route("api/v{version:apiVersion}/[controller]")] 
     [Authorize]
 
     public class VagaController : ControllerBase
@@ -48,11 +49,11 @@ namespace HeimdallApi.Controllers
                 } : null,
                 links = new
                 {
-                    self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "Vaga", new { id = vaga.Id }),
-                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Vaga", new { id = vaga.Id }),
-                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Vaga", new { id = vaga.Id }),
-                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Vaga"),
-                    zonaResource = linkGenerator.GetPathByAction(HttpContext, "GetById", "Zona", new { id = vaga.ZonaId })
+                    self = linkGenerator.GetPathByAction(HttpContext, nameof(GetById), "Vaga", new { version = "1.0", id = vaga.Id }),
+                    update = linkGenerator.GetPathByAction(HttpContext, nameof(Put), "Vaga", new { version = "1.0", id = vaga.Id }),
+                    delete = linkGenerator.GetPathByAction(HttpContext, nameof(Delete), "Vaga", new { version = "1.0", id = vaga.Id }),
+                    all = linkGenerator.GetPathByAction(HttpContext, nameof(Get), "Vaga", new { version = "1.0"}),
+                    zonaResource = linkGenerator.GetPathByAction(HttpContext, "GetById", "Zona", new { version = "1.0", id = vaga.ZonaId })
                 }
             };
         }
