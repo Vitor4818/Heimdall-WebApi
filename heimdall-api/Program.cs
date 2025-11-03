@@ -8,12 +8,15 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models; 
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 
-// --- Configuração do JWT ---
+// JWT 
 var jwtKey = builder.Configuration["Jwt:Key"];
 if (string.IsNullOrEmpty(jwtKey))
 {
@@ -21,7 +24,7 @@ if (string.IsNullOrEmpty(jwtKey))
 }
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
-// 1. Adiciona Autenticação (JWT)
+//Adiciona Autenticação (JWT)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -29,7 +32,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Mude para 'true' em produção (com HTTPS)
+    options.RequireHttpsMetadata = false; 
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -47,29 +50,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 2. Adiciona Autorização
+//Adiciona Autorização
 builder.Services.AddAuthorization();
-// --- FIM DA Configuração do JWT ---
+//--- FIM JWT ---
 
-
-
-
-
-
-
-
-
-
-
-
-//Usa PostgreSQL normalmente, exceto nos testes
+//Usa PostgreSQL, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
 {
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
-//NOTA: Se o ambiente for "Testing", o AppDbContext será injetado
-//pela CustomWebApplicationFactory em memória.
 
 // Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
@@ -86,6 +76,30 @@ builder.Services.AddSwaggerGen(options =>
         Description = "API para gerenciar motos, usuários e RFID."
     });
 
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Por favor, insira 'Bearer' [espaço] e o seu token JWT",
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+
     //Habilita comentários XML
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -98,7 +112,7 @@ builder.Services.AddSwaggerGen(options =>
 //Registrando exemplos de payload no container
 builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>(); 
 
-// Injeção de dependências
+//Injeção de dependências
 builder.Services.AddScoped<TagRfidService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<MotoService>();
@@ -111,20 +125,23 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        name: "PostgreSQL",
+        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+        tags: new[] { "db", "postgres" });
+
 var app = builder.Build();
 
 
-//--- MUDANÇA PRINCIPAL AQUI ---
-//Migrations e Seeding SÓ DEVEM OCORRER no ambiente real (não-Testing)
 if (!app.Environment.IsEnvironment("Testing"))
 {
-    // 1.Bloco de Migração e Verificação de Conexão
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         try
         {
-            //Aplica migrations pendentes
             dbContext.Database.Migrate();
 
             if (dbContext.Database.CanConnect())
@@ -142,14 +159,12 @@ if (!app.Environment.IsEnvironment("Testing"))
         }
     }
 
-    //2. Bloco do Seeder
     using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         DbSeeder.SeedMotos(context);
     }
 }
-//--- FIM DA MUDANÇA ---
 
 
 //Configuração do Swagger/ReDoc para Development
@@ -171,6 +186,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseAuthentication(); 
+app.UseAuthorization();  
+
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
 app.MapControllers();
 app.Urls.Add("http://0.0.0.0:5000");
 app.Run();
@@ -178,5 +204,6 @@ app.Run();
 
 namespace HeimdallApi
 {
-    public partial class Program { } // necessário para testes de integração
+    public partial class Program { } 
 }
+
