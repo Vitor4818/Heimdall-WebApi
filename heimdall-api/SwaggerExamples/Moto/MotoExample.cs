@@ -3,6 +3,9 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace MotosApi.SwaggerExamples
 {
+    /// <summary>
+    /// Exemplo de payload para POST (Cadastrar) ou PUT (Atualizar) uma Moto.
+    /// </summary>
     public class MotoExample : IExamplesProvider<MotoModel>
     {
         public MotoModel GetExamples()
@@ -13,14 +16,8 @@ namespace MotosApi.SwaggerExamples
                 tipoMoto = "Esportiva",
                 placa = "ABC1234",
                 numChassi = "9C2JC4110JR000001",
-                TagRfid = new TagRfidModel
-                {
-                    Id = 1,
-                    FaixaFrequencia = "125 kHz",
-                    Banda = "LF",
-                    Aplicacao = "Controle de acesso",
-                    MotoId = 1
-                }
+                KmRodados = 1000, 
+                VagaId = null 
             };
         }
     }
