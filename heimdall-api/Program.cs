@@ -132,7 +132,7 @@ builder.Services.AddScoped<MotoService>();
 builder.Services.AddScoped<ZonaService>();
 builder.Services.AddScoped<VagaService>();
 builder.Services.AddScoped<TokenService>();
-builder.Services.AddScoped<PredictionService>();
+//builder.Services.AddScoped<PredictionService>();
 
 
 
