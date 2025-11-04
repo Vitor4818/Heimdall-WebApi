@@ -10,7 +10,6 @@ namespace HeimdallTests
 {
     public class MotoServiceTests
     {
-        // Helper para criar um banco em memória limpo e isolado para cada teste
         private AppDbContext CriarContextoEmMemoria()
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
@@ -18,7 +17,6 @@ namespace HeimdallTests
                 .Options;
 
             var context = new AppDbContext(options);
-            // Garante que o schema (com dados do OnModelCreating) é criado
             context.Database.EnsureCreated();
             return context;
         }
@@ -28,61 +26,60 @@ namespace HeimdallTests
         [Fact]
         public void CadastrarMoto_DeveOcuparVaga_SeVagaIdValidoELivre()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
             
-            // 1. Cria dependências (Zona e Vaga Livre)
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
             contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
             
-            // 2. Moto a ser cadastrada
-            var motoNova = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 };
+            var motoNova = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 500 };
 
-            // Agir (Act)
+            // Act
             var resultado = service.CadastrarMoto(motoNova);
 
-            // Verificar (Assert)
+            // Assert
             Assert.NotNull(resultado);
+            Assert.Equal(500, resultado!.KmRodados);
             var vagaDoBanco = contexto.Vaga.Find(1)!;
-            Assert.True(vagaDoBanco.Ocupada); // <-- REGRA DE NEGÓCIO: Vaga deve estar ocupada
+            Assert.True(vagaDoBanco.Ocupada);
         }
 
         [Fact]
         public void CadastrarMoto_DeveFalhar_SeVagaNaoExiste()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
-            var motoNova = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 99 }; // Vaga 99 não existe
+            var motoNova = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 99 };
 
-            // Agir (Act)
+            // Act
             var resultado = service.CadastrarMoto(motoNova);
 
-            // Verificar (Assert)
+            // Assert
             Assert.Null(resultado); 
         }
 
         [Fact]
         public void CadastrarMoto_DeveFalhar_SeVagaJaOcupada()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
 
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
-            contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true }); // <-- Vaga ocupada
+            contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true }); 
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
             var motoNova = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 };
 
-            // Agir (Act)
+            // Act
             var resultado = service.CadastrarMoto(motoNova);
 
-            // Verificar (Assert)
+            // Assert
             Assert.Null(resultado); 
         }
 
@@ -93,47 +90,49 @@ namespace HeimdallTests
         [Fact]
         public void Atualizar_DeveOcuparVagaNova_CenarioDeEntrada()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
             
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
-            contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false }); // Vaga livre
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = null }); // Moto sem vaga
+            contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false }); 
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = null, KmRodados = 1000 }); 
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 }; // Entrando na Vaga 1
+            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1500 }; 
 
-            // Agir (Act)
+            // Act
             var resultado = service.Atualizar(motoAtualizada);
 
-            // Verificar (Assert)
+            // Assert
             Assert.True(resultado);
             var vagaDoBanco = contexto.Vaga.Find(1)!;
+            var motoDoBanco = contexto.Moto.Find(10)!;
             Assert.True(vagaDoBanco.Ocupada); 
+            Assert.Equal(1500, motoDoBanco.KmRodados);
         }
 
         [Fact]
         public void Atualizar_DeveLiberarVagaAntiga_CenarioDeSaida()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
 
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
             var vaga = new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true };
             contexto.Vaga.Add(vaga);
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 });
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1000 });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = null }; // Saindo da Vaga 1
+            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = null };
 
-            // Agir (Act)
+            // Act
             var resultado = service.Atualizar(motoAtualizada);
 
-            // Verificar (Assert)
+            // Assert
             Assert.True(resultado);
             var vagaDoBanco = contexto.Vaga.Find(1)!;
             Assert.False(vagaDoBanco.Ocupada); 
@@ -142,7 +141,7 @@ namespace HeimdallTests
         [Fact]
         public void Atualizar_DeveTrocarVagasCorretamente_CenarioDeTroca()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
 
@@ -150,16 +149,16 @@ namespace HeimdallTests
             var vagaA = new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true };
             var vagaB = new VagaModel { Id = 2, Codigo = "V2", ZonaId = 1, Ocupada = false };
             contexto.Vaga.AddRange(vagaA, vagaB);
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 });
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1000 });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 2 }; // Trocando da Vaga 1 para a 2
+            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 2 }; 
 
-            // Agir (Act)
+            // Act
             var resultado = service.Atualizar(motoAtualizada);
 
-            // Verificar (Assert)
+            // Assert
             Assert.True(resultado);
             var vagaDoBancoA = contexto.Vaga.Find(1)!;
             var vagaDoBancoB = contexto.Vaga.Find(2)!;
@@ -170,25 +169,25 @@ namespace HeimdallTests
         [Fact]
         public void Atualizar_DeveFalhar_SeVagaNovaEstiverOcupada()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
 
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
             var vagaA = new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true };
-            var vagaB = new VagaModel { Id = 2, Codigo = "V2", ZonaId = 1, Ocupada = true }; // Vaga B também está ocupada
+            var vagaB = new VagaModel { Id = 2, Codigo = "V2", ZonaId = 1, Ocupada = true }; 
             contexto.Vaga.AddRange(vagaA, vagaB);
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 });
-            contexto.Moto.Add(new MotoModel { id = 11, tipoMoto = "Custom", placa = "DEF", numChassi = "456", VagaId = 2 }); // Moto 11 ocupa a Vaga B
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1000 });
+            contexto.Moto.Add(new MotoModel { id = 11, tipoMoto = "Custom", placa = "DEF", numChassi = "456", VagaId = 2, KmRodados = 500 }); 
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 2 }; // Tentando trocar para a Vaga B (ocupada)
+            var motoAtualizada = new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 2 };
 
-            // Agir (Act)
+            // Act
             var resultado = service.Atualizar(motoAtualizada);
 
-            // Verificar (Assert)
+            // Assert
             Assert.False(resultado); 
         }
 
@@ -199,21 +198,21 @@ namespace HeimdallTests
         [Fact]
         public void Remover_DeveLiberarVaga_SeMotoEstavaEstacionada()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
 
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
             var vaga = new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = true };
             contexto.Vaga.Add(vaga);
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 });
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1000 });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            // Agir (Act)
+            // Act
             var resultado = service.Remover(10);
 
-            // Verificar (Assert)
+            // Assert
             Assert.True(resultado);
             Assert.Empty(contexto.Moto); 
             var vagaDoBanco = contexto.Vaga.Find(1)!;
@@ -223,17 +222,17 @@ namespace HeimdallTests
         [Fact]
         public void Remover_DeveFuncionar_SeMotoSemVaga()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = null });
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = null, KmRodados = 1000 });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            // Agir (Act)
+            // Act
             var resultado = service.Remover(10);
 
-            // Verificar (Assert)
+            // Assert
             Assert.True(resultado);
             Assert.Empty(contexto.Moto);
         }
@@ -245,43 +244,45 @@ namespace HeimdallTests
         [Fact]
         public void ListarTodas_DeveRetornarMotosComVagaEInclude()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
             contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1 });
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 });
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1000 });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            // Agir (Act)
+            // Act
             var resultado = service.ListarTodas().ToList();
 
-            // Verificar (Assert)
+            // Assert
             Assert.Single(resultado);
             Assert.NotNull(resultado[0].Vaga);
-            Assert.Equal("V1", resultado[0].Vaga.Codigo);
+            Assert.Equal(1000, resultado[0].KmRodados); 
+            Assert.Equal("V1", resultado[0].Vaga!.Codigo);
         }
 
         [Fact]
         public void ObterPorId_DeveRetornarMotoComVagaEInclude()
         {
-            // Organizar (Arrange)
+            // Arrange
             var contexto = CriarContextoEmMemoria();
             var service = new MotoService(contexto);
             contexto.Zona.Add(new ZonaModel { Id = 1, Nome = "Z1", Tipo = "Tipo" });
             contexto.Vaga.Add(new VagaModel { Id = 1, Codigo = "V1", ZonaId = 1 });
-            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1 });
+            contexto.Moto.Add(new MotoModel { id = 10, tipoMoto = "Sport", placa = "ABC", numChassi = "123", VagaId = 1, KmRodados = 1000 });
             contexto.SaveChanges();
             contexto.ChangeTracker.Clear();
 
-            // Agir (Act)
+            // Act
             var resultado = service.ObterPorId(10);
 
-            // Verificar (Assert)
+            // Assert
             Assert.NotNull(resultado);
-            Assert.NotNull(resultado.Vaga);
-            Assert.Equal("V1", resultado.Vaga.Codigo);
+            Assert.NotNull(resultado!.Vaga);
+            Assert.Equal(1000, resultado.KmRodados); 
+            Assert.Equal("V1", resultado.Vaga!.Codigo);
         }
 
         #endregion
