@@ -5,28 +5,25 @@
 # (Versão "Pronta a Rodar" com valores "chumbados")
 # ==========================================================
 
-# --- 1. VARIÁVEIS (Lidas do Pipeline do Azure DevOps) ---
+# --- 1. VARIÁVEIS (Valores "Chumbados" para a Sprint) ---
 
-# --- CORREÇÃO (Sintaxe Bash) ---
-# No Bash, para LER uma variável de ambiente (como as do pipeline),
-# usamos $WebAppName (sem os parênteses).
-# 'app=$(WebAppName)' estava a tentar EXECUTAR um comando chamado 'WebAppName'.
-# ---
+# Gera um sufixo único (baseado no carimbo de tempo) para evitar conflitos de nome
+UNIQUE_SUFFIX=$(date +%s)
 
 rg="rg-heimdall-api"
-location="Central US"              
+location="Central US"              # (Mudado de East US para Central US)
 plan="plan-heimdall-api"
-app=$WebAppName                   # <-- CORRIGIDO
+app="heimdall-api-vitor-$UNIQUE_SUFFIX" # (Ex: heimdall-api-vitor-176223456)
 runtime="dotnet:9"
-sku_app="F1"                       
+sku_app="F1"                       # F1 = Gratuito (para o Web App)
 
-db_server_name=$DbServerName      # <-- CORRIGIDO
+db_server_name="heimdall-db-vitor-$UNIQUE_SUFFIX" # (Ex: heimdall-db-vitor-176223456)
 db_name="heimdalldb"
 db_admin_user="heimdalladmin"
-db_admin_pass="HeimdallPass123@"   
-sku_db="standard_b1ms"         
-# --- FIM DA CORREÇÃO ---
+db_admin_pass="HeimdallPass123@"   # (ATENÇÃO: Mude isto num projeto real!)
 
+# (Corrigido de "B_Standard_B1ms" para "standard_b1ms")
+sku_db="standard_b1ms"         
 
 echo "=== INICIANDO CRIAÇÃO DE INFRAESTRUTURA ==="
 echo "Grupo de Recursos: $rg"
@@ -35,12 +32,6 @@ echo "Servidor DB: $db_server_name"
 echo "Localização: $location"
 
 # --- 2. CRIAÇÃO DO GRUPO E WEB APP ---
-# (Verifica se as variáveis não estão vazias antes de começar)
-if [ -z "$app" ] || [ -z "$db_server_name" ] || [ -z "$location" ]; then
-    echo "ERRO CRÍTICO: As variáveis WebAppName, DbServerName ou LOCATION estão vazias."
-    echo "Verifique a aba 'Variables' do seu Release Pipeline no Azure DevOps."
-    exit 1
-fi
 
 echo "[1/5] Criando Grupo de Recursos '$rg'..."
 az group create --name "$rg" --location "$location" 1>/dev/null
@@ -84,9 +75,9 @@ az postgres flexible-server db create \
 
 echo "[5/5] Injetando a 'DefaultConnection' (Connection String) no Web App..."
 
+# Constrói a Connection String (usando a senha "chumbada")
 # --- CORREÇÃO (SSL) ---
-# Adiciona "SslMode=Require" à connection string,
-# que é obrigatório para o PostgreSQL Flexível da Azure.
+# Adiciona "SslMode=Require", obrigatório para o PostgreSQL Flexível da Azure.
 connection_string="Host=$db_server_name.postgres.database.azure.com;Database=$db_name;Username=$db_admin_user;Password=$db_admin_pass;SslMode=Require"
 # --- FIM DA CORREÇÃO ---
 
