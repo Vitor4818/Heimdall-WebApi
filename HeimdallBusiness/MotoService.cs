@@ -32,16 +32,6 @@ namespace HeimdallBusiness
                             .FirstOrDefault(m => m.id == id);
             }
 
-
-            public MotoModel? ObterPorTipo(string tipo)
-            {
-                        return _context.Moto
-                                    .Include(m => m.TagRfid)
-                                    .Include(m => m.Vaga)
-                                    .FirstOrDefault(m => m.tipoMoto == tipo);
-                            
-            }
-
         public MotoModel? CadastrarMoto(MotoModel moto)
         {
             VagaModel? vagaParaOcupar = null;

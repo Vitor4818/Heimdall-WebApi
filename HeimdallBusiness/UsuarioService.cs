@@ -29,47 +29,37 @@ namespace HeimdallBusiness
                 .FirstOrDefault(u => u.id == id);
         }
 
-        public UsuarioModel? ObterPorNome(string nome)
-        {
-            return _context.Usuarios
-                .Include(u => u.CategoriaUsuario)
-                .FirstOrDefault(u => u.Nome == nome);
-        }
+        // (O método ObterPorNome foi removido na nossa refatoração anterior)
 
         
-       
+        
         public UsuarioModel? Login(string email, string senha)
         {
             var usuario = _context.Usuarios
                                 .Include(u => u.CategoriaUsuario) 
                                 .FirstOrDefault(u => u.Email == email);
 
-            // 1. Verifica se o usuário existe
             if (usuario == null)
             {
                 return null; 
             }
 
-            // 2. Verifica a senha (BCrypt)
             if (!BCrypt.Net.BCrypt.Verify(senha, usuario.Senha))
             {
                 return null; 
             }
 
-            // 3. Sucesso
             return usuario;
         }
 
 
         public UsuarioModel? CadastrarUsuario(UsuarioModel user)
         {
-            // 1. Verifica se o Email já existe
             if (_context.Usuarios.Any(u => u.Email == user.Email))
             {
                 return null; 
             }
 
-            // 2. Verifica se a CategoriaUsuarioId é válida
             var categoriaExiste = _context.CategoriasUsuario.Find(user.CategoriaUsuarioId);
             if (categoriaExiste == null)
             {
@@ -89,13 +79,15 @@ namespace HeimdallBusiness
             var existente = _context.Usuarios.Find(user.id);
             if (existente == null) return false;
 
-            // 1. Verifica se o Email está a ser alterado para um que já existe
-            if (_context.Usuarios.Any(u => u.Email == user.Email && u.id != user.id))
+            
+            if (existente.Email != user.Email) 
             {
-                return false; 
+                if (_context.Usuarios.Any(u => u.Email == user.Email))
+                {
+                    return false; 
+                }
             }
 
-            // 2. Verifica se a CategoriaUsuarioId é válida
             var categoriaExiste = _context.CategoriasUsuario.Find(user.CategoriaUsuarioId);
             if (categoriaExiste == null)
             {
@@ -110,7 +102,8 @@ namespace HeimdallBusiness
             existente.CategoriaUsuarioId = user.CategoriaUsuarioId; 
 
             _context.SaveChanges();
-            return true;
+            return true; 
+
         }
 
         public bool RemoverUsuario(int id)
