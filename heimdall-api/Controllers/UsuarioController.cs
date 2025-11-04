@@ -108,15 +108,25 @@ namespace UsuariosApi.Controllers
             return usuario == null ? NotFound() : Ok(GetUsuarioResource(usuario));
         }
 
-        [HttpGet("nome")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [SwaggerOperation(Summary = "Obtém um usuário pelo nome", Description = "Retorna os dados de um usuário específico pelo nome.")]
-        public IActionResult GetPorNome(string nome)
-        {
-            var usuario = usuarioService.ObterPorNome(nome);
-            return usuario == null ? NotFound() : Ok(GetUsuarioResource(usuario));
-        }
+[HttpGet("nome")]
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[SwaggerOperation(Summary = "Obtém usuários pelo nome", Description = "Retorna uma lista de usuários filtrados pelo nome.")]
+public async Task<IActionResult> GetPorNome([FromQuery] string nome)
+{
+
+    var usuarios = await usuarioService.ListarUsuario()
+        .Where(u => u.Nome.ToLower().Contains(nome.ToLower())) 
+        .ToListAsync();
+    
+    if (usuarios == null || !usuarios.Any()) 
+    {
+        return NotFound("Nenhum usuário encontrado para este nome.");
+    }
+    
+    var resultado = usuarios.Select(u => GetUsuarioResource(u)).ToList();
+    return Ok(resultado);
+}
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]

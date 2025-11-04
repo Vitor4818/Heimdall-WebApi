@@ -32,16 +32,6 @@ namespace HeimdallBusiness
                             .FirstOrDefault(m => m.id == id);
             }
 
-
-            public MotoModel? ObterPorTipo(string tipo)
-            {
-                        return _context.Moto
-                                    .Include(m => m.TagRfid)
-                                    .Include(m => m.Vaga)
-                                    .FirstOrDefault(m => m.tipoMoto == tipo);
-                            
-            }
-
         public MotoModel? CadastrarMoto(MotoModel moto)
         {
             VagaModel? vagaParaOcupar = null;
@@ -87,6 +77,8 @@ namespace HeimdallBusiness
             existente.placa = moto.placa;
             existente.numChassi = moto.numChassi;
             existente.VagaId = moto.VagaId; 
+            existente.KmRodados = moto.KmRodados; 
+
 
             //--inicio da regra de transição de vagas--
 
@@ -139,12 +131,10 @@ namespace HeimdallBusiness
             var tagVinculada = _context.TagsRfid.FirstOrDefault(t => t.MotoId == id);
             if (tagVinculada != null)
             {
-                //Desvincula a tag (define MotoId = 0, que é "nulo")
                 tagVinculada.MotoId = 0;
             }
 
 
-            // Lógica da Vaga (que já estava correta, mas removi o .Update)
             if (motoParaRemover.VagaId != null)
             {
                 var vagaOcupada = _context.Vaga.Find(motoParaRemover.VagaId);
@@ -156,7 +146,6 @@ namespace HeimdallBusiness
 
             _context.Moto.Remove(motoParaRemover); 
             
-            // Salva TODAS as alterações (Moto apagada, Tag atualizada, Vaga atualizada)
             _context.SaveChanges(); 
             return true; 
         }

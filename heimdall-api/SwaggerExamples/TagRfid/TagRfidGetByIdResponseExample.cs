@@ -15,10 +15,12 @@ namespace HeimdallApi.SwaggerExamples.TagRfid
                 aplicacao = "Rastreamento de frota",
                 links = new
                 {
-                    self = "/api/TagRfid/1",
-                    update = "/api/TagRfid/1",
-                    delete = "/api/TagRfid/1",
-                    all = "/api/TagRfid"
+                    // --- CORRIGIDO (VERSIONAMENTO) ---
+                    self = "/api/v1/TagRfid/1",
+                    update = "/api/v1/TagRfid/1",
+                    delete = "/api/v1/TagRfid/1",
+                    all = "/api/v1/TagRfid"
+                    // --- FIM DA CORREÇÃO ---
                 }
             };
         }

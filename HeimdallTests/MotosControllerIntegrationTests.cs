@@ -35,11 +35,9 @@ namespace HeimdallTests
             var zona = new ZonaModel { Id = 1, Nome = "Zona A", Tipo = "Comercial" };
             (await _client.PostAsJsonAsync("/api/v1/zona", zona)).EnsureSuccessStatusCode();
 
-            // 2. Cria Vaga 1
             var vaga1 = new { Id = 1, Codigo = "V1", ZonaId = 1, Ocupada = false };
             (await _client.PostAsJsonAsync("/api/v1/vaga", vaga1)).EnsureSuccessStatusCode();
 
-            // 3. Cria Vaga 2 
             var vaga2 = new { Id = 2, Codigo = "V2", ZonaId = 1, Ocupada = false };
             (await _client.PostAsJsonAsync("/api/v1/vaga", vaga2)).EnsureSuccessStatusCode();
         }
@@ -146,7 +144,6 @@ namespace HeimdallTests
             // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            
             var getVaga1 = await _client.GetAsync("/api/v1/vaga/1");
             getVaga1.EnsureSuccessStatusCode();
             var json1 = await getVaga1.Content.ReadAsStringAsync();
@@ -191,7 +188,6 @@ namespace HeimdallTests
             // Assert
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
             var getVaga1 = await _client.GetAsync("/api/v1/vaga/1");
             getVaga1.EnsureSuccessStatusCode();
             var json1 = await getVaga1.Content.ReadAsStringAsync();

@@ -35,6 +35,7 @@ public class MotosController : ControllerBase
             moto.tipoMoto,
             moto.placa,
             moto.numChassi,
+            moto.KmRodados, 
             moto.VagaId,
             vaga = moto.Vaga != null
                 ? new
@@ -45,7 +46,7 @@ public class MotosController : ControllerBase
                     moto.Vaga.ZonaId,
                     links = new
                     {
-                        self = linkGenerator.GetPathByAction(HttpContext, "GetById", "Vaga", new { id = moto.Vaga.Id })
+                        self = linkGenerator.GetPathByAction(HttpContext, "GetById", "Vaga", new { version = "1.0", id = moto.Vaga.Id })
                     }
                 }
                 : null,
@@ -56,7 +57,11 @@ public class MotosController : ControllerBase
                     moto.TagRfid.MotoId,
                     moto.TagRfid.FaixaFrequencia,
                     moto.TagRfid.Banda,
-                    moto.TagRfid.Aplicacao
+                    moto.TagRfid.Aplicacao,
+                    links = new
+                    {
+                        self = linkGenerator.GetPathByAction(HttpContext, "GetById", "TagRfid", new { version = "1.0", id = moto.TagRfid.Id })
+                    }
                 }
                 : null,
             links = new
@@ -103,9 +108,9 @@ public class MotosController : ControllerBase
             TotalItems = totalItems,
             Links = new
             {
-                self = Url.Action(nameof(Get), new { page, pageSize }),
-                next = page < totalPages ? Url.Action(nameof(Get), new { page = page + 1, pageSize }) : null,
-                prev = page > 1 ? Url.Action(nameof(Get), new { page = page - 1, pageSize }) : null
+                self = Url.Action(nameof(Get), new { version = "1.0", page, pageSize }),
+                next = page < totalPages ? Url.Action(nameof(Get), new { version = "1.0", page = page + 1, pageSize }) : null,
+                prev = page > 1 ? Url.Action(nameof(Get), new { version = "1.0", page = page - 1, pageSize }) : null
             },
             Items = motosComLinks
         };
@@ -131,13 +136,15 @@ public class MotosController : ControllerBase
     [SwaggerOperation(Summary = "Obtém motos por tipo")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetPorTipo([FromQuery] string tipo)
+    public async Task<IActionResult> GetPorTipo([FromQuery] string tipo)
     {
-        // NOTA: arrumar o service ObterPorTipo pois está retornando APENAS UMA moto.
-        var moto = motoService.ObterPorTipo(tipo);
-        if (moto == null) return NotFound();
-
-        var resultado = GetMotoResource(moto);
+        var motos = await motoService.ListarTodas()
+            .Where(m => m.tipoMoto.ToLower() == tipo.ToLower())
+            .ToListAsync();
+        
+        if (motos == null || !motos.Any()) return NotFound("Nenhuma moto encontrada para este tipo.");
+        
+        var resultado = motos.Select(m => GetMotoResource(m)).ToList();
         return Ok(resultado);
     }
 
@@ -159,7 +166,8 @@ public class MotosController : ControllerBase
         }
 
         var resultado = GetMotoResource(criada);
-        return CreatedAtAction(nameof(Get), new { id = criada.id }, resultado);
+        
+        return CreatedAtAction(nameof(Get), new { version = "1.0", id = criada.id }, resultado);
     }
 
     [HttpPut("{id}")]
@@ -179,7 +187,7 @@ public class MotosController : ControllerBase
             return NotFound(); 
         }
 
-       
+        
         var sucesso = motoService.Atualizar(moto);
 
         if (!sucesso)
