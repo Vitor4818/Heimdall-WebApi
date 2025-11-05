@@ -14,10 +14,19 @@ sku_app="F1"
 
 db_server_name="heimdall-db-vitor"
 db_name="heimdalldb"
-db_admin_user="heimdalladmin"
-db_admin_pass="HeimdallPass123@"    # ⚠️ Trocar em projeto real!
 sku_db="standard_b1ms"
 
+# Variáveis de Key Vault passadas pela pipeline
+key_vault_name=${KEY_VAULT_NAME}
+db_admin_user_secret_name=${DB_USER_SECRET_NAME}
+db_admin_pass_secret_name=${DB_PASS_SECRET_NAME}
+
+# --- 2. Ler segredos do Key Vault ---
+echo "[0/5] Buscando segredos no Key Vault '$key_vault_name'..."
+db_admin_user=$(az keyvault secret show --vault-name "$key_vault_name" --name "$db_admin_user_secret_name" --query value -o tsv)
+db_admin_pass=$(az keyvault secret show --vault-name "$key_vault_name" --name "$db_admin_pass_secret_name" --query value -o tsv)
+
+# --- 3. VERIFICAR/CRIAR PLANO DE SERVIÇO E WEB APP ---
 echo "=== INICIANDO CRIAÇÃO/VERIFICAÇÃO DE INFRAESTRUTURA ==="
 echo "Grupo de Recursos: $rg"
 echo "Web App: $app"
@@ -25,35 +34,27 @@ echo "Servidor DB: $db_server_name"
 echo "Localização: $location"
 echo "========================================================"
 
-# --- 2. GRUPO DE RECURSOS ---
-if az group show --name "$rg" &>/dev/null; then
-  echo "[1/5] Grupo de recursos '$rg' já existe, pulando criação."
-else
-  echo "[1/5] Criando grupo de recursos '$rg'..."
-  az group create --name "$rg" --location "$location" 1>/dev/null
-fi
-
-# --- 3. PLANO DE SERVIÇO ---
-if az appservice plan show --name "$plan" --resource-group "$rg" &>/dev/null; then
-  echo "[2/5] Plano de serviço '$plan' já existe, pulando criação."
-else
-  echo "[2/5] Criando plano de serviço '$plan' (SKU: $sku_app)..."
-  az appservice plan create --name "$plan" --resource-group "$rg" --location "$location" --sku "$sku_app" 1>/dev/null
-fi
-
-# --- 4. WEB APP ---
+# Web App
 if az webapp show --name "$app" --resource-group "$rg" &>/dev/null; then
-  echo "[3/5] Web App '$app' já existe, atualizando configuração..."
+  echo "[1/5] Web App '$app' já existe, atualizando configuração..."
 else
-  echo "[3/5] Criando Web App '$app'..."
+  echo "[1/5] Criando Web App '$app'..."
+  az appservice plan create --name "$plan" --resource-group "$rg" --location "$location" --sku "$sku_app" 1>/dev/null
   az webapp create --resource-group "$rg" --plan "$plan" --runtime "$runtime" --name "$app" 1>/dev/null
 fi
 
-# --- 5. BANCO DE DADOS ---
+# --- 4. BANCO DE DADOS ---
+
+if [[ -z "$db_admin_user" || -z "$db_admin_pass" ]]; then
+  echo "Erro: não foi possível ler as credenciais do Key Vault."
+  exit 1
+fi
+
+
 if az postgres flexible-server show --name "$db_server_name" --resource-group "$rg" &>/dev/null; then
-  echo "[4/5] Servidor PostgreSQL '$db_server_name' já existe, pulando criação."
+  echo "[2/5] Servidor PostgreSQL '$db_server_name' já existe, pulando criação."
 else
-  echo "[4/5] Criando Servidor PostgreSQL '$db_server_name'..."
+  echo "[2/5] Criando Servidor PostgreSQL '$db_server_name'..."
   az postgres flexible-server create \
       --name "$db_server_name" \
       --resource-group "$rg" \
@@ -80,16 +81,12 @@ else
       --database-name "$db_name" 1>/dev/null
 fi
 
-# --- 6. CONEXÃO COM O BANCO ---
-echo "[5/5] Injetando a Connection String no Web App..."
+# --- 5. CONEXÃO COM O BANCO ---
+echo "[3/5] Injetando a Connection String no Web App..."
 connection_string="Host=$db_server_name.postgres.database.azure.com;Database=$db_name;Username=$db_admin_user;Password=$db_admin_pass;SslMode=Require"
+az webapp config appsettings set --resource-group "$rg" --name "$app" --settings "POSTGRES_CONN_STR=$connection_string" 1>/dev/null
 
-az webapp config appsettings set \
-    --resource-group "$rg" \
-    --name "$app" \
-    --settings "POSTGRES_CONN_STR=$connection_string" 1>/dev/null
-
-# --- 7. LOGS ---
+# --- 6. LOGS ---
 echo "Habilitando logs do App Service..."
 az webapp log config \
     --resource-group "$rg" \
@@ -100,8 +97,7 @@ az webapp log config \
     --detailed-error-messages true \
     --failed-request-tracing true 1>/dev/null
 
-# --- 8. EXPORTAR VARIÁVEL PARA PIPELINE ---
-# Essa linha cria uma variável no Azure DevOps chamada APP_NAME
+# --- 7. EXPORTAR VARIÁVEL PARA PIPELINE ---
 echo "##vso[task.setvariable variable=APP_NAME;isOutput=true]$app"
 
 echo "=========================================="
@@ -109,4 +105,3 @@ echo "[OK] Infraestrutura da API Heimdall pronta!"
 echo "App Service: $app"
 echo "Database Server: $db_server_name"
 echo "=========================================="
-#teste
