@@ -32,7 +32,6 @@ echo "Servidor DB: $db_server_name"
 echo "Localização: $location"
 
 # --- 2. CRIAÇÃO DO GRUPO E WEB APP ---
-
 echo "[1/5] Criando Grupo de Recursos '$rg'..."
 az group create --name "$rg" --location "$location" 1>/dev/null
 
