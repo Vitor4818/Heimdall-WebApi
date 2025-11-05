@@ -76,17 +76,18 @@ az postgres flexible-server db create \
 echo "[5/5] Injetando a 'DefaultConnection' (Connection String) no Web App..."
 
 # Constrói a Connection String (usando a senha "chumbada")
-# --- CORREÇÃO (SSL) ---
-# Adiciona "SslMode=Require", obrigatório para o PostgreSQL Flexível da Azure.
 connection_string="Host=$db_server_name.postgres.database.azure.com;Database=$db_name;Username=$db_admin_user;Password=$db_admin_pass;SslMode=Require"
-# --- FIM DA CORREÇÃO ---
 
-# Injeta a Connection String nas "Configurações" do Web App
+# --- CORREÇÃO (Bug 500.30) ---
+# O 'Program.cs' usa 'GetConnectionString("DefaultConnection")'.
+# O comando 'az' para isto NÃO é '--settings', mas sim '--name'.
 az webapp config connection-string set \
     --resource-group "$rg" \
     --name "$app" \
     --connection-string-type "PostgreSQL" \
-    --settings "DefaultConnection=$connection_string" 1>/dev/null
+    --name "DefaultConnection" \
+    --connection-string "$connection_string" 1>/dev/null
+# --- FIM DA CORREÇÃO ---
 
 # --- 5. HABILITAR LOGS ---
 echo "Habilitando Logs do Serviço de Aplicativo..."
