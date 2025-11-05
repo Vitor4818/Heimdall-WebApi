@@ -55,13 +55,16 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 // --- FIM DA Configuração do JWT ---
 
+// --- CORREÇÃO (Bug de Teste CS1061) ---
+// Adicionamos o 'builder' do Health Check AQUI, fora do 'if'.
+// Isto garante que o 'IServiceCollection.AddHealthChecks()' é sempre chamado.
+var healthChecksBuilder = builder.Services.AddHealthChecks();
+// --- FIM DA CORREÇÃO ---
+
 //Usa PostgreSQL, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
 {
-    // --- CORREÇÃO (Bug 500.30) ---
-    // Em vez de usar GetConnectionString (que estava a ler o 'localhost' do appsettings.json),
-    // lemos a variável de ambiente 'POSTGRES_CONN_STR' que o nosso
-    // script 'azure_infra.sh' (no Canvas) injetou.
+    // ... (Lógica da Connection String 'POSTGRES_CONN_STR') ...
     var connectionString = builder.Configuration["POSTGRES_CONN_STR"];
     if (string.IsNullOrEmpty(connectionString))
     {
@@ -69,6 +72,16 @@ if (!builder.Environment.IsEnvironment("Testing"))
     }
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString));
+    
+    // --- CORREÇÃO (Bug de Teste CS1061) ---
+    // Agora, apenas adicionamos a verificação do Npgsql (que depende
+    // da connection string) DENTRO do 'if' de produção.
+    healthChecksBuilder
+        .AddNpgSql(
+            connectionString, // Usa a variável que já lemos
+            name: "PostgreSQL",
+            failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+            tags: new[] { "db", "postgres" });
     // --- FIM DA CORREÇÃO ---
 }
 
@@ -157,16 +170,8 @@ builder.Services.AddSingleton<PredictionService>();
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-// Health Checks
-builder.Services.AddHealthChecks()
-    .AddNpgSql(
-        // --- CORREÇÃO (Bug 500.30) ---
-        // O Health Check também precisa de ler a variável correta.
-        builder.Configuration["POSTGRES_CONN_STR"],
-        // --- FIM DA CORREÇÃO ---
-        name: "PostgreSQL",
-        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
-        tags: new[] { "db", "postgres" });
+// (A chamada principal do Health Check foi movida para cima, para fora do 'if')
+
 
 var app = builder.Build();
 
