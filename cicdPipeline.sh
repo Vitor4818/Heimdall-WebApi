@@ -109,3 +109,4 @@ echo "[OK] Infraestrutura da API Heimdall pronta!"
 echo "App Service: $app"
 echo "Database Server: $db_server_name"
 echo "=========================================="
+#teste
