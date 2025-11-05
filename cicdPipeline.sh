@@ -72,20 +72,19 @@ az postgres flexible-server db create \
 
 # --- 4. O "PULO DO GATO" (Ligar o Web App ao Banco) ---
 
-echo "[5/5] Injetando a 'DefaultConnection' (Connection String) no Web App..."
+echo "[5/5] Injetando a Connection String no Web App..."
 
 # Constrói a Connection String (usando a senha "chumbada")
 connection_string="Host=$db_server_name.postgres.database.azure.com;Database=$db_name;Username=$db_admin_user;Password=$db_admin_pass;SslMode=Require"
 
 # --- CORREÇÃO (Bug 500.30) ---
-# O 'Program.cs' usa 'GetConnectionString("DefaultConnection")'.
-# O comando 'az' para isto NÃO é '--settings', mas sim '--name'.
-az webapp config connection-string set \
+# Em vez de usar a secção "Connection Strings", injetamos
+# a string como uma "Configuração de Aplicação" (App Setting) normal.
+# Isto GARANTE que ela sobrescreve o appsettings.json.
+az webapp config appsettings set \
     --resource-group "$rg" \
     --name "$app" \
-    --connection-string-type "PostgreSQL" \
-    --name "DefaultConnection" \
-    --connection-string "$connection_string" 1>/dev/null
+    --settings "POSTGRES_CONN_STR=$connection_string" 1>/dev/null
 # --- FIM DA CORREÇÃO ---
 
 # --- 5. HABILITAR LOGS ---

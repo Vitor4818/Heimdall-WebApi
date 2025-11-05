@@ -10,8 +10,8 @@ using System.Text;
 using Microsoft.OpenApi.Models; 
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc.ApiExplorer; // Para Versionamento
+using Microsoft.AspNetCore.Mvc.Versioning; // Para Versionamento
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,7 @@ if (string.IsNullOrEmpty(jwtKey))
 }
 var key = Encoding.ASCII.GetBytes(jwtKey);
 
+// 1. Adiciona Autenticação (JWT)
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,20 +51,32 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// 2. Adiciona Autorização
 builder.Services.AddAuthorization();
-// -----
+// --- FIM DA Configuração do JWT ---
 
 //Usa PostgreSQL, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
 {
+    // --- CORREÇÃO (Bug 500.30) ---
+    // Em vez de usar GetConnectionString (que estava a ler o 'localhost' do appsettings.json),
+    // lemos a variável de ambiente 'POSTGRES_CONN_STR' que o nosso
+    // script 'azure_infra.sh' (no Canvas) injetou.
+    var connectionString = builder.Configuration["POSTGRES_CONN_STR"];
+    if (string.IsNullOrEmpty(connectionString))
+    {
+        throw new InvalidOperationException("A Connection String 'POSTGRES_CONN_STR' não foi encontrada nas App Settings.");
+    }
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(connectionString));
+    // --- FIM DA CORREÇÃO ---
 }
 
-//Adiciona controllers e Swagger/ReDoc
+// Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+// --- ADICIONA O SERVIÇO DE VERSIONAMENTO ---
 builder.Services.AddApiVersioning(options =>
 {
     options.ReportApiVersions = true; 
@@ -75,19 +88,20 @@ builder.Services.AddApiVersioning(options =>
     );
 });
 
-//Faz o versionamento funcionar com o Swagger
+// Faz o versionamento funcionar com o Swagger
 builder.Services.AddVersionedApiExplorer(options =>
 {
     options.GroupNameFormat = "'v'VVV"; 
     options.SubstituteApiVersionInUrl = true; 
 });
+// --- FIM DO SERVIÇO DE VERSIONAMENTO ---
 
 
 builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations(); 
     
-
+    // (O SwaggerDoc("v1", ...) foi removido, o loop 'foreach' no SwaggerUI trata disso)
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -132,7 +146,11 @@ builder.Services.AddScoped<MotoService>();
 builder.Services.AddScoped<ZonaService>();
 builder.Services.AddScoped<VagaService>();
 builder.Services.AddScoped<TokenService>();
-//builder.Services.AddScoped<PredictionService>();
+
+// --- ADICIONA O SERVIÇO DE ML.NET ---
+// Adicionamos como Singleton para que o modelo seja treinado apenas UMA VEZ
+builder.Services.AddSingleton<PredictionService>();
+// --- FIM DO SERVIÇO ---
 
 
 
@@ -142,7 +160,10 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
+        // --- CORREÇÃO (Bug 500.30) ---
+        // O Health Check também precisa de ler a variável correta.
+        builder.Configuration["POSTGRES_CONN_STR"],
+        // --- FIM DA CORREÇÃO ---
         name: "PostgreSQL",
         failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
         tags: new[] { "db", "postgres" });
@@ -189,7 +210,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-
+        // Cria um endpoint do Swagger para cada versão
         foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
         {
             c.SwaggerEndpoint(
