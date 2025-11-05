@@ -107,7 +107,6 @@ builder.Services.AddVersionedApiExplorer(options =>
     options.GroupNameFormat = "'v'VVV"; 
     options.SubstituteApiVersionInUrl = true; 
 });
-// --- FIM DO SERVIÇO DE VERSIONAMENTO ---
 
 
 builder.Services.AddSwaggerGen(options =>
@@ -159,18 +158,13 @@ builder.Services.AddScoped<MotoService>();
 builder.Services.AddScoped<ZonaService>();
 builder.Services.AddScoped<VagaService>();
 builder.Services.AddScoped<TokenService>();
-
-// --- ADICIONA O SERVIÇO DE ML.NET ---
-// Adicionamos como Singleton para que o modelo seja treinado apenas UMA VEZ
 builder.Services.AddSingleton<PredictionService>();
-// --- FIM DO SERVIÇO ---
 
 
 
 builder.Services.AddControllers().AddJsonOptions(x =>
     x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
-// (A chamada principal do Health Check foi movida para cima, para fora do 'if')
 
 
 var app = builder.Build();
@@ -248,7 +242,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 });
 
 app.MapControllers();
-app.Urls.Add("http://0.0.0.0:5000");
+builder.WebHost.UseUrls("http://0.0.0.0:5000");
 app.Run();
 
 
