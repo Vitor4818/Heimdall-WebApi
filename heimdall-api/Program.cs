@@ -64,26 +64,27 @@ var healthChecksBuilder = builder.Services.AddHealthChecks();
 //Usa PostgreSQL, exceto nos testes
 if (!builder.Environment.IsEnvironment("Testing"))
 {
-    // ... (Lógica da Connection String 'POSTGRES_CONN_STR') ...
-    var connectionString = builder.Configuration["POSTGRES_CONN_STR"];
+    // Usa o helper padrão do .NET para ler "ConnectionStrings:DefaultConnection"
+    // (que é o que "ConnectionStrings__DefaultConnection" significa para o Azure)
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
     if (string.IsNullOrEmpty(connectionString))
     {
-        throw new InvalidOperationException("A Connection String 'POSTGRES_CONN_STR' não foi encontrada nas App Settings.");
+        // Atualiza a mensagem de erro para refletir o nome correto
+        throw new InvalidOperationException("A Connection String 'DefaultConnection' não foi encontrada nas App Settings.");
     }
+    
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString));
     
-    // --- CORREÇÃO (Bug de Teste CS1061) ---
-    // Agora, apenas adicionamos a verificação do Npgsql (que depende
-    // da connection string) DENTRO do 'if' de produção.
     healthChecksBuilder
         .AddNpgSql(
-            connectionString, // Usa a variável que já lemos
+            connectionString, // Usa a variável que acabamos de ler
             name: "PostgreSQL",
             failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
             tags: new[] { "db", "postgres" });
-    // --- FIM DA CORREÇÃO ---
 }
+// --- FIM DO BLOCO CORRIGIDO ---
 
 // Adiciona controllers e Swagger/ReDoc
 builder.Services.AddControllers();
@@ -242,7 +243,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 });
 
 app.MapControllers();
-builder.WebHost.UseUrls("http://0.0.0.0:5000");
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
 app.Run();
 
 
