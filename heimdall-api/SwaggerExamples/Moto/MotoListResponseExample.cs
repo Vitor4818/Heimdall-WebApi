@@ -15,8 +15,9 @@ namespace MotosApi.SwaggerExamples
                 totalItems = 12,
                 links = new
                 {
-                    self = "/api/Motos?page=1&pageSize=10",
-                    next = "/api/Motos?page=2&pageSize=10",
+                    self = "/api/v1/Motos?page=1&pageSize=10",
+                    next = "/api/v1/Motos?page=2&pageSize=10",
+                    prev = (string?)null
                 },
                 items = new[]
                 {
@@ -26,20 +27,37 @@ namespace MotosApi.SwaggerExamples
                         tipoMoto = "Esportiva",
                         placa = "ABC1234",
                         numChassi = "9C2JC4110JR000001",
+                        kmRodados = 1000.0f,
+                        vagaId = 1,
+                        vaga = new
+                        {
+                            Id = 1,
+                            Codigo = "V1",
+                            Ocupada = true,
+                            ZonaId = 1,
+                            links = new
+                            {
+                                self = "/api/v1/Vaga/1"
+                            }
+                        },
                         tagRfid = new
                         {
                             Id = 1,
                             MotoId = 1,
                             FaixaFrequencia = "865-868 MHz",
                             Banda = "UHF",
-                            Aplicacao = "Rastreamento"
+                            Aplicacao = "Rastreamento",
+                            links = new
+                            {
+                                self = "/api/v1/TagRfid/1"
+                            }
                         },
                         links = new
                         {
-                            self = "/api/Motos/1",
-                            update = "/api/Motos/1",
-                            delete = "/api/Motos/1",
-                            all = "/api/Motos"
+                            self = "/api/v1/Motos/1",
+                            update = "/api/v1/Motos/1",
+                            delete = "/api/v1/Motos/1",
+                            all = "/api/v1/Motos"
                         }
                     }
                 }

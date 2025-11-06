@@ -14,8 +14,9 @@ namespace HeimdallApi.SwaggerExamples.TagRfid
                 totalItems = 15,
                 links = new
                 {
-                    self = "/api/TagRfid?page=1&pageSize=10",
-                    next = "/api/TagRfid?page=2&pageSize=10",
+                    // --- CORRIGIDO (VERSIONAMENTO) ---
+                    self = "/api/v1/TagRfid?page=1&pageSize=10",
+                    next = "/api/v1/TagRfid?page=2&pageSize=10",
                     prev = (string?)null
                 },
                 items = new[]
@@ -29,13 +30,14 @@ namespace HeimdallApi.SwaggerExamples.TagRfid
                         aplicacao = "Rastreamento de frota",
                         links = new
                         {
-                            self = "/api/TagRfid/1",
-                            update = "/api/TagRfid/1",
-                            delete = "/api/TagRfid/1",
-                            all = "/api/TagRfid"
+                            self = "/api/v1/TagRfid/1",
+                            update = "/api/v1/TagRfid/1",
+                            delete = "/api/v1/TagRfid/1",
+                            all = "/api/v1/TagRfid"
                         }
                     }
                 }
+                // --- FIM DA CORREÇÃO ---
             };
         }
     }

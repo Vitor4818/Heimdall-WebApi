@@ -1,0 +1,5 @@
+# Ignora pastas de build e de IDE
+**/bin/
+**/obj/
+.vs/
+.vscode/

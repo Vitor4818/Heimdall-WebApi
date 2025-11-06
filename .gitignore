@@ -1,0 +1,27 @@
+Ficheiro .gitignore Padrão para .NET Core
+
+Pastas de Build (O "Lixo")
+
+[Bb]in/
+[Oo]bj/
+
+Ficheiros de Definições de Utilizador
+
+*.user
+*.userosscache
+*.sln.docstates
+
+Ficheiros do Visual Studio
+
+.vs/
+*.dotCover
+
+Ficheiros de IDE (Rider / VS Code)
+
+.idea/
+.vscode/
+
+Ficheiros de SO
+
+*.DS_Store
+Thumbs.db

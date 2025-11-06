@@ -28,10 +28,10 @@ namespace HeimdallApi.Examples
                         cpf = "123.456.789-00",
                         email = "vitor.gomes@exemplo.com",
                         links = new {
-                            self = "/api/usuario/1",
-                            update = "/api/usuario/1",
-                            delete = "/api/usuario/1",
-                            all = "/api/usuario"
+                           self = "/api/v1/Usuario/1",
+                            update = "/api/v1/Usuario/1",
+                            delete = "/api/v1/Usuario/1",
+                            all = "/api/v1/Usuario"
                         }
                     },
                     new {
@@ -42,10 +42,10 @@ namespace HeimdallApi.Examples
                         cpf = "987.654.321-00",
                         email = "lucas.mendes@exemplo.com",
                         links = new {
-                            self = "/api/usuario/2",
-                            update = "/api/usuario/2",
-                            delete = "/api/usuario/2",
-                            all = "/api/usuario"
+                            self = "/api/v1/Usuario/2",
+                            update = "/api/v1/Usuario/2",
+                            delete = "/api/v1/Usuario/2",
+                            all = "/api/v1/Usuario"
                         }
                     }
                 }
