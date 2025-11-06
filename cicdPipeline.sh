@@ -2,9 +2,10 @@
 # ==========================================================
 # Script de Infraestrutura (IaC) para a API Heimdall (MOTTU)
 # Cria: Web App + Banco de Dados PostgreSQL Flexível
+# Usa: Variable Group do Azure DevOps para credenciais
 # ==========================================================
 
-# --- 1. VARIÁVEIS ---
+# --- 1. VARIÁVEIS FIXAS ---
 rg="rg-heimdall-api"
 location="Central US"
 plan="plan-heimdall-api"
@@ -16,17 +17,18 @@ db_server_name="heimdall-db-vitor"
 db_name="heimdalldb"
 sku_db="standard_b1ms"
 
-# Variáveis de Key Vault passadas pela pipeline
-key_vault_name=${KEY_VAULT_NAME}
-db_admin_user_secret_name=${DB_USER_SECRET_NAME}
-db_admin_pass_secret_name=${DB_PASS_SECRET_NAME}
+# --- 2. VARIÁVEIS DE CREDENCIAIS (da Variable Group do Azure DevOps) ---
+# Certifique-se de linkar a Variable Group no pipeline
+db_admin_user="${DB_ADMIN_USER}"
+db_admin_pass="${DB_ADMIN_PASS}"
 
-# --- 2. Ler segredos do Key Vault ---
-echo "[0/5] Buscando segredos no Key Vault '$key_vault_name'..."
-db_admin_user=$(az keyvault secret show --vault-name "$key_vault_name" --name "$db_admin_user_secret_name" --query value -o tsv)
-db_admin_pass=$(az keyvault secret show --vault-name "$key_vault_name" --name "$db_admin_pass_secret_name" --query value -o tsv)
+# --- 3. CHECK DE CREDENCIAIS ---
+if [[ -z "$db_admin_user" || -z "$db_admin_pass" ]]; then
+  echo "Erro: credenciais do banco não configuradas. Verifique a Variable Group!"
+  exit 1
+fi
 
-# --- 3. VERIFICAR/CRIAR PLANO DE SERVIÇO E WEB APP ---
+# --- 4. LOG DE INÍCIO ---
 echo "=== INICIANDO CRIAÇÃO/VERIFICAÇÃO DE INFRAESTRUTURA ==="
 echo "Grupo de Recursos: $rg"
 echo "Web App: $app"
@@ -34,27 +36,33 @@ echo "Servidor DB: $db_server_name"
 echo "Localização: $location"
 echo "========================================================"
 
-# Web App
-if az webapp show --name "$app" --resource-group "$rg" &>/dev/null; then
-  echo "[1/5] Web App '$app' já existe, atualizando configuração..."
+# --- 5. GRUPO DE RECURSOS ---
+if ! az group show --name "$rg" &>/dev/null; then
+  echo "[1/5] Criando grupo de recursos '$rg'..."
+  az group create --name "$rg" --location "$location" 1>/dev/null
 else
-  echo "[1/5] Criando Web App '$app'..."
+  echo "[1/5] Grupo de recursos '$rg' já existe, pulando criação."
+fi
+
+# --- 6. PLANO DE SERVIÇO ---
+if ! az appservice plan show --name "$plan" --resource-group "$rg" &>/dev/null; then
+  echo "[2/5] Criando plano de serviço '$plan' (SKU: $sku_app)..."
   az appservice plan create --name "$plan" --resource-group "$rg" --location "$location" --sku "$sku_app" 1>/dev/null
-  az webapp create --resource-group "$rg" --plan "$plan" --runtime "$runtime" --name "$app" 1>/dev/null
-fi
-
-# --- 4. BANCO DE DADOS ---
-
-if [[ -z "$db_admin_user" || -z "$db_admin_pass" ]]; then
-  echo "Erro: não foi possível ler as credenciais do Key Vault."
-  exit 1
-fi
-
-
-if az postgres flexible-server show --name "$db_server_name" --resource-group "$rg" &>/dev/null; then
-  echo "[2/5] Servidor PostgreSQL '$db_server_name' já existe, pulando criação."
 else
-  echo "[2/5] Criando Servidor PostgreSQL '$db_server_name'..."
+  echo "[2/5] Plano de serviço '$plan' já existe, pulando criação."
+fi
+
+# --- 7. WEB APP ---
+if ! az webapp show --name "$app" --resource-group "$rg" &>/dev/null; then
+  echo "[3/5] Criando Web App '$app'..."
+  az webapp create --resource-group "$rg" --plan "$plan" --runtime "$runtime" --name "$app" 1>/dev/null
+else
+  echo "[3/5] Web App '$app' já existe, pulando criação."
+fi
+
+# --- 8. BANCO DE DADOS ---
+if ! az postgres flexible-server show --name "$db_server_name" --resource-group "$rg" &>/dev/null; then
+  echo "[4/5] Criando Servidor PostgreSQL '$db_server_name'..."
   az postgres flexible-server create \
       --name "$db_server_name" \
       --resource-group "$rg" \
@@ -79,14 +87,19 @@ else
       --resource-group "$rg" \
       --server-name "$db_server_name" \
       --database-name "$db_name" 1>/dev/null
+else
+  echo "[4/5] Servidor PostgreSQL '$db_server_name' já existe, pulando criação."
 fi
 
-# --- 5. CONEXÃO COM O BANCO ---
-echo "[3/5] Injetando a Connection String no Web App..."
+# --- 9. CONEXÃO COM O BANCO ---
+echo "[5/5] Injetando a Connection String no Web App..."
 connection_string="Host=$db_server_name.postgres.database.azure.com;Database=$db_name;Username=$db_admin_user;Password=$db_admin_pass;SslMode=Require"
-az webapp config appsettings set --resource-group "$rg" --name "$app" --settings "POSTGRES_CONN_STR=$connection_string" 1>/dev/null
+az webapp config appsettings set \
+    --resource-group "$rg" \
+    --name "$app" \
+    --settings "POSTGRES_CONN_STR=$connection_string" 1>/dev/null
 
-# --- 6. LOGS ---
+# --- 10. LOGS DO APP SERVICE ---
 echo "Habilitando logs do App Service..."
 az webapp log config \
     --resource-group "$rg" \
@@ -97,7 +110,7 @@ az webapp log config \
     --detailed-error-messages true \
     --failed-request-tracing true 1>/dev/null
 
-# --- 7. EXPORTAR VARIÁVEL PARA PIPELINE ---
+# --- 11. EXPORTAR VARIÁVEL PARA PIPELINE ---
 echo "##vso[task.setvariable variable=APP_NAME;isOutput=true]$app"
 
 echo "=========================================="
