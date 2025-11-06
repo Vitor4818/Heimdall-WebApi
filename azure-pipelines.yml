@@ -1,5 +1,5 @@
 trigger:
-- feature/ml-revisao
+- azure-pipelines
 
 pool:
   vmImage: ubuntu-latest
