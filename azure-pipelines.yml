@@ -6,9 +6,18 @@ pool:
 
 steps:
 
-- script: 
+# --- ETAPA DE TESTE ADICIONADA (Requisito VI) ---
+# 1. Roda os testes primeiro.
+- task: DotNetCoreCLI@2
+  displayName: 'Rodar Testes Unitários (HeimdallTests)'
+  inputs:
+    command: 'test'
+    projects: '**/HeimdallTests.csproj' 
+    publishTestResults: true
 
+# 2. Se os testes passarem, constrói e envia a imagem.
 - task: Docker@2
+  displayName: 'Build e Push da Imagem Docker'
   inputs:
     containerRegistry: 'heimdallregisterServiceConnection'
     repository: 'heimdall-api'
