@@ -197,11 +197,11 @@ app.UseHttpsRedirection();
 app.UseAuthentication(); 
 app.UseAuthorization(); 
 
-app.MapHealthChecks("/health", new HealthCheckOptions
-{
-    Predicate = _ => true,
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
+//app.MapHealthChecks("/health", new HealthCheckOptions
+//{
+//    Predicate = _ => true,
+//    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+//});
 
 app.MapControllers();
 builder.WebHost.UseUrls("http://0.0.0.0:8080"); // Mantenha isso, está correto.
