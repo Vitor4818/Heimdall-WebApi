@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace HeimdallApi.Controllers
 {
@@ -62,7 +63,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [SwaggerOperation(Summary = "Obtém todas as vagas", Description = "Retorna uma lista de todas as vagas cadastradas com paginação")]
-        // reservado para example
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(HeimdallApi.SwaggerExamples.VagaListResponseExample))] 
         public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (page <= 0) page = 1;
@@ -102,7 +103,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(Summary = "Obtém uma Vaga por id", Description = "Retorna uma vaga específica, caso exista.")]
-        // reservado para example
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(HeimdallApi.SwaggerExamples.VagaGetResponseExample))] 
         public IActionResult GetById(int id)
         {
             var vaga = vagaService.ObterPorId(id);
@@ -113,14 +114,14 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation(Summary = "Cadastra uma nova vaga", Description = "Cadastra uma nova vaga no sistema.")]
-        //Reservado para example 
+        [SwaggerRequestExample(typeof(VagaModel), typeof(HeimdallApi.SwaggerExamples.VagaExample))] 
         public IActionResult Post([FromBody] VagaModel vaga)
         {
             if (string.IsNullOrWhiteSpace(vaga.Codigo) || vaga.ZonaId <= 0)
             {
                 return BadRequest("O 'Codigo' da vaga é obrigatório e a 'ZonaId' deve ser válida (maior que 0).");
             }
-            
+
 
             var criada = vagaService.CadastrarVaga(vaga);
             var resource = GetVagaResources(criada);
@@ -132,7 +133,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(Summary = "Atualiza uma vaga existente", Description = "Atualiza o Código e a ZonaId de uma vaga.")]
-        //Reservado para example
+        [SwaggerRequestExample(typeof(VagaModel), typeof(HeimdallApi.SwaggerExamples.VagaExample))] // EXEMPLO DE REQUISIÇÃO
         public IActionResult Put(int id, [FromBody] VagaModel vaga)
         {
             if (vaga == null || vaga.Id != id)

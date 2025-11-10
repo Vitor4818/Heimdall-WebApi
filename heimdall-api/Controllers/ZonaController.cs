@@ -4,6 +4,7 @@ using HeimdallBusiness;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using Swashbuckle.AspNetCore.Filters;
 
 
 
@@ -52,7 +53,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [SwaggerOperation(Summary = "Obtém todas as zonas", Description = "Retorna uma lista de todas as zonas cadastradas com paginação")]
-        // reservado para example
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(HeimdallApi.SwaggerExamples.ZonaListResponseExample))] 
         public async Task<IActionResult> Get([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             if (page <= 0) page = 1;
@@ -94,7 +95,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(Summary = "Obtém uma zona por id", Description = "Retorna uma zona específica, caso exista.")]
-        // reservado para example
+        [SwaggerResponseExample(StatusCodes.Status200OK, typeof(HeimdallApi.SwaggerExamples.ZonaGetResponseExample))] 
         public IActionResult GetById(int id)
         {
             var zona = zonaService.ObterPorId(id);
@@ -105,7 +106,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [SwaggerOperation(Summary = "Cadastra uma nova Zona", Description = "Cadastra uma nova Zona no sistema.")]
-        //Reservado para example 
+        [SwaggerRequestExample(typeof(ZonaModel), typeof(HeimdallApi.SwaggerExamples.ZonaExample))]
         public IActionResult Post([FromBody] ZonaModel zona)
         {
             if (string.IsNullOrWhiteSpace(zona.Nome) ||
@@ -124,7 +125,7 @@ namespace HeimdallApi.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [SwaggerOperation(Summary = "Atualiza uma zona existente", Description = "Atualiza os dados de uma zona já cadastrada.")]
-        //Reservado para example
+        [SwaggerRequestExample(typeof(ZonaModel), typeof(HeimdallApi.SwaggerExamples.ZonaExample))] 
         public IActionResult Put(int id, [FromBody] ZonaModel zona)
         {
             if (zona == null || zona.Id != id)
