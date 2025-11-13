@@ -4,7 +4,9 @@ A **Heimdall Web API** é uma API RESTful desenvolvida com **ASP.NET Core** para
 
 - 🏍️ Motos  
 - 🧑‍💼 Usuários  
-- 🏷️ Tags RFID  
+- 🏷️ Tags RFID
+- 🅿 Vagas
+- 🗺️ Zonas
 
 Cada **moto** está associada a **uma tag RFID** (relação 1:1), e **vice-versa**. Todos os dados são persistidos utilizando **Entity Framework Core** com **Postgres**.  
 A arquitetura segue os padrões modernos, com **injeção de dependência** e **camadas separadas** para garantir a manutenção e escalabilidade do código.
@@ -18,7 +20,8 @@ A arquitetura segue os padrões modernos, com **injeção de dependência** e **
 | `heimdall-api`     | API Web com os endpoints (`Controllers`) |
 | `HeimdallBusiness` | Camada de lógica de negócio |
 | `HeimdallData`     | Camada de acesso a dados com EF Core + Postgres |
-| `HeimdallModel`    | Contém os modelos: `Moto`, `TagRfid`, `Usuario` |
+| `HeimdallModel`    | Contém os modelos: `Moto`, `TagRfid`, `Usuario`, `Vaga`, `Zona` |
+|`HeimdallTest`      | Contém os testes unitários e de integração |
 
 
 #### A Heimdall Web API adota arquitetura monolítica por ser simples de desenvolver, implantar e manter, atendendo ao escopo atual de CRUD de motos, usuários e tags RFID. Apesar de ser um único sistema, é modularizado em camadas (API, negócio, dados e modelos), garantindo organização e manutenção facilitada, com possibilidade de evolução futura para microserviços se necessário.
@@ -31,6 +34,7 @@ A arquitetura segue os padrões modernos, com **injeção de dependência** e **
 - **Entity Framework Core**  
 - **Swagger (OpenAPI)**  
 - **Redoc**
+- **Autenticação com token JWT**
 
 ---
 
@@ -142,10 +146,8 @@ POST /api/Usuario
 
 - ✅ **RESTful**: Padrões de rota e verbos HTTP bem definidos
 - ✅ **Arquitetura em camadas**: Controller + Service + Repository
-- ✅ **Injeção de Dependência (DI)**: Baixo acoplamento, fácil de testar
 - ✅ **Documentação automática**: Swagger e Redoc com testes via navegador
 - ✅ **HATEOAS**
 - ✅ **Paginação**
-
-
+- ✅ **Testes unitários e de integração**
 ---
